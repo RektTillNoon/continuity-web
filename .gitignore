@@ -17,3 +17,7 @@
 dist/*
 !dist/.gitkeep
 !dist/*.pdf
+!dist/continuity-web.html
+!dist/assets/
+!dist/assets/*.png
+!dist/assets/*.svg

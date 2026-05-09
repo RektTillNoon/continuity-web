@@ -19,6 +19,7 @@ src/
   continuity_web_concept_brief.tex   Short concept brief source
 
 dist/
+  continuity-web.html                Standalone web presentation
   continuity_web_report.pdf          Published report PDF
   continuity_web_concept_brief.pdf   Published concept brief PDF
 
