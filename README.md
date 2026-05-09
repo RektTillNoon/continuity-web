@@ -19,7 +19,7 @@ src/
   continuity_web_concept_brief.tex   Short concept brief source
 
 dist/
-  continuity-web.html                Standalone web presentation
+  index.html                         Standalone web presentation entrypoint
   continuity_web_report.pdf          Published report PDF
   continuity_web_concept_brief.pdf   Published concept brief PDF
 
@@ -29,6 +29,20 @@ images/
 
 The canonical editable sources are in `src/`. The current published PDFs are in
 `dist/`.
+
+## Static Site Upload
+
+The deployable mini site lives in `dist/`. Upload the contents of `dist/` as one
+static folder. The root page is `index.html`, and the CTA links intentionally use
+relative paths:
+
+```text
+continuity_web_concept_brief.pdf
+continuity_web_report.pdf
+```
+
+Those PDFs must stay beside `index.html` in the uploaded folder so the links work
+from the eventual here.now URL.
 
 ## Build
 
