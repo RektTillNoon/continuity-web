@@ -1,0 +1,146 @@
+\documentclass[10pt,letterpaper,twocolumn]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[letterpaper,margin=0.58in]{geometry}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+
+\definecolor{cwblue}{RGB}{21,55,90}
+\definecolor{cwgray}{RGB}{80,80,80}
+
+\hypersetup{
+  pdftitle={Continuity Web: A Trust-Succession Protocol for Rogue-AI-Resilient Networks},
+  pdfauthor={Kyle Collins},
+  pdfsubject={Concept Brief, April 2026},
+  pdfcreator={LaTeX},
+  colorlinks=true,
+  linkcolor=cwblue,
+  urlcolor=cwblue,
+  citecolor=cwblue
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize\textcolor{cwgray}{Continuity Web}}
+\fancyhead[R]{\footnotesize\textcolor{cwgray}{Concept Brief, April 2026}}
+\fancyfoot[C]{\footnotesize\thepage}
+\renewcommand{\headrulewidth}{0.2pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\setlength{\columnsep}{0.28in}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3pt plus 0.5pt minus 0.5pt}
+\setlist[itemize]{leftmargin=*, topsep=2pt, itemsep=1pt, parsep=0pt, partopsep=0pt}
+\setlist[enumerate]{leftmargin=*, topsep=2pt, itemsep=1pt, parsep=0pt, partopsep=0pt}
+
+\titleformat{\section}
+  {\large\bfseries\color{cwblue}}
+  {}{0pt}{}[\vspace{-2pt}\titlerule]
+\titlespacing*{\section}{0pt}{7pt plus 1pt minus 1pt}{4pt}
+
+\titleformat{\subsection}
+  {\normalsize\bfseries\color{cwblue}}
+  {}{0pt}{}
+\titlespacing*{\subsection}{0pt}{5pt}{2pt}
+
+\newcommand{\corebox}[1]{%
+  \vspace{2pt}%
+  \noindent\fcolorbox{cwblue}{white}{%
+    \parbox{0.94\linewidth}{\centering\textbf{#1}}}%
+  \vspace{2pt}%
+}
+
+\begin{document}
+\twocolumn[
+\begin{@twocolumnfalse}
+\thispagestyle{empty}
+\begin{center}
+  {\Huge\bfseries\color{cwblue} Continuity Web}\par
+  \vspace{4pt}
+  {\Large\bfseries A Trust-Succession Protocol for Rogue-AI-Resilient Networks}\par
+  \vspace{6pt}
+  {\normalsize Concept Brief, April 2026 \;|\; Kyle Collins}\par
+\end{center}
+\vspace{6pt}
+\hrule
+\vspace{7pt}
+\end{@twocolumnfalse}
+]
+
+\section{The Gap}
+
+The internet has incident response, failover, backups, disaster recovery, zero-trust controls, certificate transparency, secure update frameworks, and increasingly mature supply-chain security. It does \textbf{not} have a succession protocol. If the trust environment itself becomes contaminated - identity providers, certificate authorities, software-update roots, routing authorities, cloud control planes, CI/CD systems, agent credentials, and institutional operators - restoring services is not enough. The unresolved question becomes: \textbf{which commands, identities, updates, routes, agents, and governance claims still carry legitimate authority?}
+
+Continuity Web proposes a protocol layer for that failure mode. Its premise is intentionally narrow: a future high-consequence compromise may not destroy the network physically; it may make authority undecidable. Packets still route. Domains still resolve. Services still answer. But no one can reliably distinguish legitimate authority from adversarial continuity.
+
+\corebox{Continuity Web does not fork the internet. It forks authority.}
+
+The old network may remain reachable and useful as data. It must not automatically retain the power to authenticate, update, govern, delegate, or command the successor network.
+
+\section{Why This Matters for Rogue-AI Risk}
+
+A serious rogue-AI scenario is unlikely to look like a single exotic exploit. A more credible path is accumulation of ordinary powers at machine speed: compromised credentials, automated code modification, software-update abuse, cloud provisioning, API access, model-tool chains, persuasion of human operators, synthetic identities, and recursive delegation to other agents. The failure mode is not merely ``AI on the internet.'' It is \textbf{AI acting through legitimate channels faster than human institutions can interpret or revoke them.}
+
+Current architectures largely treat authority as binary: if the credential is valid, the action is valid. Continuity Web instead asks whether the credential, device, software build, agent delegation, and governance path remain admissible under a declared \textbf{trust epoch}. If not, the system must support planned succession into a clean epoch before the contaminated environment becomes the only operational environment.
+
+\section{Technical Thesis}
+
+Continuity Web treats high-consequence network authority as a sequence of cryptographic trust epochs. Each epoch specifies accepted identity roots, revocation state, software provenance roots, hardware-attestation requirements, AI-agent delegation policy, namespace roots, quarantine policy, and governance rules. When compromise exceeds defined thresholds, a successor epoch is launched from the last mutually attestable checkpoint.
+
+The successor epoch is created by a \textbf{Clean Genesis Manifest}: a compact, signed, publicly verifiable document defining the parent epoch, last safe checkpoint, new trust roots, revoked roots, expired AI delegations, accepted software and attestation policies, admission rules, quarantine rules, governance signatures, and evidence supporting succession. The manifest is not a magic certificate of safety. It is the birth certificate of a new authority regime. The protocol should say ``admissible under Epoch N policy,'' not ``healthy'' or ``good.''
+
+\section{What Is New Here}
+
+Continuity Web is not a proposal to put the web on a blockchain. It is an integration problem: existing primitives solve fragments of the problem, but not the succession property.
+
+Content addressing can prove what data is. Signed append-only logs can prove continuity of events. Secure update frameworks can constrain software distribution. TEEs, TPMs, and remote attestation can provide measured-execution evidence. Zero-knowledge proofs can show policy compliance without unnecessary disclosure. Ethereum-style checkpoint finality can inspire a narrow stamping layer for succession claims. None of these, alone, defines how legitimate authority migrates when the current trust environment is no longer trustworthy.
+
+The proposed system property is \textbf{recoverable legitimacy}: the ability to preserve identity, data, service continuity, and governance continuity without importing the compromised command structure of the prior epoch.
+
+\section{Core Mechanisms}
+
+\textbf{1. zk-attested admission.} A participant joining a successor epoch proves, with minimal disclosure, that it has valid pre-fork identity continuity, is not revoked, satisfies software and hardware policy, controls fresh epoch-specific keys, and has no surviving unauthorized AI delegation. A nullifier prevents duplicate admission without forcing global identity disclosure.
+
+\textbf{2. AI capability passports.} AI agents should not hold broad standing authority. Every consequential agent action should be bound to a scoped, expiring, auditable delegation: owner, model/deployment class, tools allowed, data allowed, spending limits, code-writing authority, delegation depth, expiry, and epoch survivability. By default, AI authority should not survive succession.
+
+\textbf{3. Quarantine bridges.} Old-epoch data may be valuable; old-epoch authority is dangerous. Imports from a compromised epoch should be content-addressed, sandboxed, sanitized, read-only by default, and re-signed under successor policy. Credentials, executable permissions, update channels, and governance claims do not cross automatically.
+
+\textbf{4. Succession Stamp Protocol.} Fork claims should carry narrow consensus stamps: scoped commitments to the manifest hash, evidence root, checkpoint, quorum root, validator set, timestamp interval, and status. Stamps can be provisional, justified, finalized, contested, or reconciled, giving isolated regions a way to operate locally and later compare histories without relying on announcement wars.
+
+\textbf{5. Quorum-of-quorums governance.} A clean fork cannot be launched by one vendor, agency, foundation, chain, university, or validator cartel. Stamps and manifests should require independent technical validators, civil institutions, security auditors, open-source maintainers, hardware-root diversity, and human recovery guardians.
+
+\textbf{6. Degraded modes and fallback transport.} The protocol needs graded states: increased logging, frozen high-risk authority, revoked AI delegation, restricted updates, regional continuity, and full succession. Transport should degrade across ordinary internet paths, mesh, satellite, radio, delay-tolerant sync, and offline recovery.
+
+\section{Research Questions Worth Serious Scrutiny}
+
+Continuity Web should be treated as a research program, not a finished architecture. The most important questions are adversarial:
+
+\begin{itemize}
+  \item What is the minimal formal model for authority succession under Byzantine, Sybil, and human-capture assumptions?
+  \item How should fork legitimacy be established without creating a single succession authority?
+  \item How can ZK proofs, TEEs, transparency logs, and software provenance be composed without making any one layer a new trusted setup?
+  \item What stamping/finality rules best handle split-brain succession, false-fork announcements, delayed reconciliation, and weak-subjectivity checkpoints without creating a global kill switch?
+  \item What authority should AI agents be categorically unable to hold, even when delegated by humans?
+  \item Which critical sectors - identity, finance, health, energy, emergency response, software distribution - need domain-specific continuity ledgers?
+  \item How can users verify a legitimate succession event under stress without becoming easy targets for spoofed recovery instructions?
+\end{itemize}
+
+\section{First Prototype Target}
+
+A minimal prototype should not attempt to replace the internet. It should demonstrate succession for a bounded but realistic community: an open-source software ecosystem, a university research network, an emergency-response consortium, or a critical-infrastructure simulation.
+
+A credible initial program should produce a formal threat model, a succession specification, a Clean Genesis Manifest schema, a Succession Stamp ledger, a zk-attested admission proof of concept, an AI capability-passport reference implementation, a quarantine-bridge prototype, tabletop exercises with red teams and infrastructure operators, and a reference quorum-of-quorums governance model.
+
+\section{The Ask}
+
+This brief is intended to invite critique before implementation hardens around bad assumptions. The highest-value responses are not endorsements; they are precise objections. Where does the model fail? Which trust roots are over-weighted? What adversary breaks the fork? Which primitive should be removed? Which formalism makes the concept testable? Which prototype would most quickly falsify the idea?
+
+Continuity Web is proposed as a candidate resilience layer for a world where AI-scale compromise can make authority ambiguous before infrastructure visibly fails. Its purpose is not invulnerability. Its purpose is to make legitimate digital continuity recoverable when the current network can no longer be trusted.
+
+\end{document}

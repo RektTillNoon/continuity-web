@@ -1,0 +1,19 @@
+.DS_Store
+
+# LaTeX build products
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Keep published PDFs, ignore transient build files in dist.
+dist/*
+!dist/.gitkeep
+!dist/*.pdf

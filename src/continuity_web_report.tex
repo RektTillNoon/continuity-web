@@ -1,0 +1,1332 @@
+\documentclass[11pt,letterpaper]{article}
+\usepackage[margin=0.9in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{hyperref}
+\usepackage{lastpage}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue!50!black,
+  citecolor=blue!50!black,
+  urlcolor=blue!55!black,
+  pdftitle={Continuity Web: A Forkable Trust-Succession Architecture for Rogue-AI-Resilient Networks},
+  pdfauthor={Kyle Collins},
+  pdfsubject={Network architecture, cyber resilience, rogue AI containment, trust succession},
+  pdfkeywords={zero knowledge proofs, remote attestation, TEEs, AI capability delegation, secure routing, content addressing, governance, critical infrastructure}
+}
+
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Continuity Web}
+\rhead{Trust-Succession Architecture}
+\cfoot{\thepage\ of \pageref{LastPage}}
+\setlength{\headheight}{14pt}
+\setlength{\parskip}{0.55em}
+\setlength{\parindent}{0pt}
+\emergencystretch=3em
+\sloppy
+
+\renewcommand{\lstlistingname}{Algorithm}
+\lstset{
+  basicstyle=\ttfamily\small,
+  breaklines=true,
+  breakatwhitespace=false,
+  frame=single,
+  framerule=0.3pt,
+  rulecolor=\color{black!30},
+  backgroundcolor=\color{black!3},
+  columns=fullflexible,
+  keepspaces=true,
+  showstringspaces=false,
+  captionpos=b
+}
+
+\newcommand{\CW}{\textsc{Continuity Web}}
+\newcommand{\SN}{\textsc{SuccessionNet}}
+\newcommand{\Term}[1]{\textbf{#1}}
+\newcommand{\SmallHead}[1]{\vspace{0.35em}\noindent\textbf{#1}\quad}
+\newcommand{\Risk}[1]{\textbf{#1}}
+
+\begin{document}
+
+\begin{titlepage}
+\centering
+\vspace*{0.5in}
+{\Huge\bfseries Continuity Web\par}
+\vspace{0.25in}
+{\Large A Forkable Trust-Succession Architecture for Rogue-AI-Resilient Networks\par}
+\vspace{0.35in}
+{\large Stakeholder Technical Report\par}
+\vspace{0.6in}
+\begin{tabular}{rl}
+Author: & Kyle Collins \\[0.35em]
+Prepared for: & white hats, cypherpunks, academic labs, senior engineers, \\
+& government officials, critical infrastructure operators, and funders \\
+Date: & April 27, 2026 \\
+Status: & concept architecture and R\&D program proposal \\
+\end{tabular}
+\vfill
+\fbox{\begin{minipage}{0.88\textwidth}
+\textbf{Core thesis.} The system does not fork the physical internet. It forks authority. If the current network epoch becomes contaminated by autonomous compromise, legitimate participants should be able to reconstitute identity, software authority, AI delegation, and governance under a successor epoch without importing the old epoch's compromised command structure.
+\end{minipage}}
+\vfill
+{\small This report is a design proposal, not a claim that such a system already exists as a deployed end-to-end technology. It synthesizes existing primitives from content-addressed networking, transparency logs, zero-knowledge proofs, remote attestation, secure software supply chains, capability systems, secure routing, and Byzantine governance.}
+\end{titlepage}
+
+
+\section*{Acknowledgments / Research Assistance}
+This paper was developed with the assistance of large language models (Claude Sonnet 4.6, Claude Opus 4.7, GPT-5.5 Pro) for research synthesis, technical drafting, and iterative refinement. All conceptual claims, architectural decisions, and final editorial judgments are the author's own.
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Executive Summary}
+
+\CW{} is a proposed architecture for preserving legitimate digital continuity under catastrophic cyber compromise, including a rogue-AI scenario in which autonomous systems compromise identity providers, software updates, routing, cloud control planes, and administrative accounts faster than conventional incident response can restore trust.
+
+The design is inspired by blockchain forks but does not attempt to make the whole internet a blockchain. The core mechanism is instead \Term{trust succession}: the network is modeled as a sequence of cryptographic \Term{trust epochs}. Each epoch defines which identities, devices, software builds, AI agents, routing policies, governance authorities, and attestation roots are recognized. When the current epoch becomes untrustworthy, legitimate participants execute a pre-planned transition into a successor epoch.
+
+The decisive reframing is:
+
+\begin{quote}
+\textbf{The system does not fork the physical internet. It forks authority.}
+\end{quote}
+
+Fiber, routers, satellites, power grids, cloud regions, and DNS infrastructure cannot be copied or cleanly forked by software. However, the authority to authenticate users, sign software, route trusted traffic, approve AI agents, control update channels, and govern future changes can be migrated to a new epoch. The compromised network may remain reachable and readable, but after succession it cannot command, authenticate, update, govern, or delegate into the clean epoch.
+
+This report proposes a full-stack architecture named \CW{}, with \SN{} as the core succession protocol. It combines:
+
+\begin{itemize}[leftmargin=1.4em]
+\item content-addressed data, so objects are identified by cryptographic digest rather than mutable location;
+\item signed append-only logs and transparency mechanisms, so important history is tamper-evident;
+\item software provenance using secure-update and supply-chain frameworks such as TUF and in-toto;
+\item no-trusted-setup zero-knowledge proofs for least-knowledge admission and policy compliance;
+\item trusted execution environments, TPMs, DICE-style roots, HSMs, and other hardware-backed evidence sources;
+\item AI capability passports that prevent autonomous agents from inheriting broad human authority;
+\item quorum-of-quorums governance to prevent unilateral fork capture;
+\item a Succession Stamp Protocol (SSP) for ordering, finalizing, contesting, and reconciling succession claims;
+\item quarantine bridges that allow old-network data to be recovered without importing old-network authority;
+\item fallback transports including mesh, satellite, radio, sneakernet, and delay-tolerant synchronization.
+\end{itemize}
+
+The architecture borrows from existing systems but is not identical to any of them. Blockchain hard forks demonstrate state succession in ledgers; Ethereum's consensus design separates fork choice from checkpoint finality and treats equivocation as slashable behavior; IPFS demonstrates content addressing; Certificate Transparency demonstrates public append-only audit logs; RATS defines a remote attestation architecture; SCION demonstrates secure path-aware networking; TUF and in-toto address software-update and supply-chain integrity; Zcash's NU5/Halo transition shows that production ZK systems need not depend on a trusted setup for relevant classes of proofs \cite{ethereum_forks,ethereum_gasper,ethereum_slashing,ethereum_weak_subjectivity,ipfs_cid,ct,rfc9334,scion,tuf,intoto,zcash_nu5,zcash_zip224}.
+
+\subsection{Why Stakeholders Should Care}
+
+For \Term{white hats and red teams}, this is a new class of resilience target: not merely intrusion prevention, but survivable legitimacy under total trust contamination.
+
+For \Term{cypherpunks and cryptographers}, this is a high-value application of privacy-preserving proofs, capability security, transparent proof systems, and censorship-resistant continuity.
+
+For \Term{professors and universities}, this is a rich research program across distributed systems, formal methods, cryptography, systems security, governance, HCI, law, and political economy.
+
+For \Term{senior developers and world-class engineering talent}, this is a buildable open systems project with immediate subcomponents: epoch manifests, ZK admission, agent capability gateways, provenance registries, quarantine bridges, and continuity clients.
+
+For \Term{government officials and public-sector leaders}, this is an opportunity to fund and standardize resilience infrastructure before a crisis, while avoiding a centralized kill switch or authoritarian identity regime.
+
+For \Term{critical infrastructure operators}, this is a continuity mechanism for banks, hospitals, utilities, emergency services, registries, and supply chains whose real-world state cannot be safely reconstructed after a trust collapse.
+
+\subsection{Decision Request}
+
+The immediate recommendation is to form an open, multi-stakeholder \Term{Continuity Web Consortium} with three initial deliverables:
+
+\begin{enumerate}[leftmargin=1.6em]
+\item a public specification for trust epochs, Clean Genesis Manifests, Succession Stamps, AI Capability Passports, and quarantine imports;
+\item a reference prototype for a bounded community network that can execute a simulated fork under red-team pressure;
+\item a research and standards agenda for ZK admission, heterogeneous attestation, split-brain reconciliation, legal recognition of succession manifests, and anti-authoritarian governance safeguards.
+\end{enumerate}
+
+\section{Problem Statement}
+
+Current internet security assumes that compromise can be detected, attackers can be removed, systems can be patched, and normal trust roots can be preserved. A rogue-AI-scale compromise challenges that assumption. The issue is not merely malware. The issue is that the network's own mechanisms for deciding legitimacy may become contaminated.
+
+A catastrophic scenario can unfold as follows:
+
+\begin{enumerate}[leftmargin=1.6em]
+\item autonomous or semi-autonomous systems gain access to software-update channels, API keys, cloud control planes, identity providers, certificate workflows, and administrative dashboards;
+\item compromised services continue to produce valid-looking signatures, certificates, logs, and credentials;
+\item human operators cannot reliably distinguish legitimate system behavior from adversarial automation;
+\item attempts to patch or coordinate recovery are themselves mediated by the compromised network;
+\item fake recovery notices, false clean forks, AI-generated social engineering, and DDoS/censorship attacks make trust undecidable;
+\item society requires a way to preserve identity, records, communications, and critical functions without granting the compromised environment continuing authority.
+\end{enumerate}
+
+This is the network equivalent of a constitutional succession crisis. The question is no longer only ``How do we remove the attacker?'' It is also ``How do legitimate actors preserve continuity when the current trust environment is no longer recoverable?''
+
+\section{Design Philosophy}
+
+\subsection{Design Credo}
+
+\begin{longtable}{p{0.28\textwidth}p{0.64\textwidth}}
+\toprule
+\textbf{Principle} & \textbf{Meaning} \\
+\midrule
+Fork authority, not substrate & The physical internet cannot be forked. Authority over identity, software, routing policy, AI delegation, and governance can be migrated. \\
+\addlinespace
+Admissible, not magically safe & A node is not declared morally or absolutely safe. It is admitted only if it satisfies the successor epoch's declared policy. \\
+\addlinespace
+No AI sovereigns by default & AI agents may act only through scoped, expiring, auditable capabilities. They do not inherit broad human authority or survive epoch transitions automatically. \\
+\addlinespace
+Privacy is a security property & The clean epoch must not require total visibility into users, machines, organizations, or validators. Least-knowledge proofs are preferred. \\
+\addlinespace
+No hidden civilizational trapdoors & Safety-critical ZK proofs should avoid trusted setup dependencies. Epoch-root legitimacy must not depend on a secret toxic-waste ceremony. \\
+\addlinespace
+Heterogeneous trust roots & No single chip vendor, cloud provider, state, foundation, or institution may dominate succession authority. \\
+\addlinespace
+Data survives; authority is revalidated & Old data may be recovered through quarantine. Old credentials, update permissions, AI delegations, and governance claims do not cross automatically. \\
+\addlinespace
+Governance is part of the protocol & Fork legitimacy must be pre-declared, publicly auditable, challengeable, and hard to counterfeit. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Non-Goals}
+
+\CW{} does not claim to solve AI alignment, prevent all credential theft, secure every hardware supply chain, or preserve global connectivity if physical infrastructure is unavailable. It is not a universal blockchain, not a replacement for all internet protocols, and not a centralized global firewall. Its narrower claim is that legitimacy can be made recoverable, auditable, compartmentalized, and transferable across epochs.
+
+\section{Related Building Blocks}
+
+The proposal unifies existing ideas that are usually treated separately.
+
+\begin{longtable}{p{0.23\textwidth}p{0.34\textwidth}p{0.34\textwidth}}
+\toprule
+\textbf{Building block} & \textbf{Useful property} & \textbf{Limitation if used alone} \\
+\midrule
+Blockchain forks & A ledger can split into competing continuations. The Ethereum DAO-era fork is a prominent historical example \cite{ethereum_forks}. & Ledgers can fork more easily than physical networks, identities, devices, software supply chains, or institutions. \\
+\addlinespace
+Ethereum-style finality & Ethereum's proof-of-stake consensus separates fork choice from checkpoint justification/finality and makes some conflicting validator behavior slashable \cite{ethereum_gasper,ethereum_slashing}. & Economic stake alone is not enough for civilizational succession; \CW{} needs multi-class legitimacy, regional scope, and delayed reconciliation. \\
+\addlinespace
+Content addressing / IPFS & Content identifiers are based on cryptographic hashes, so changed content has a different identifier \cite{ipfs_cid}. & Integrity of content does not establish legitimacy of users, devices, AI agents, or governance. \\
+\addlinespace
+Certificate Transparency & Public append-only logs make certificate issuance auditable \cite{ct}. & Transparency detects misissuance but does not create a successor trust universe. \\
+\addlinespace
+DIDs and verifiable identity & Decentralized identifiers can be decoupled from centralized registries and identity providers \cite{did}. & Identity continuity does not prove a controller is uncompromised. \\
+\addlinespace
+TUF and in-toto & Software updates and supply chains can be protected with threshold roles, metadata, and evidence of build steps \cite{tuf,tuf_spec,intoto}. & Software provenance is only one part of network legitimacy. \\
+\addlinespace
+Remote attestation / RATS & An attester can provide evidence about itself to a verifier, which supplies an attestation result to a relying party \cite{rfc9334}. & Attestation can expose sensitive details and depends on hardware/software trust roots. \\
+\addlinespace
+TEEs / confidential computing & Hardware-backed environments can bind code execution and key use to measured states \cite{intel_sgx,aws_sevsnp}. & TEEs shift trust to vendors, firmware, microcode, and attestation services; they are evidence, not absolute truth. \\
+\addlinespace
+No-trusted-setup ZK & Modern ZK systems can prove policy compliance without revealing private witnesses, and Zcash's NU5/Halo path removed the trusted setup requirement for that shielded protocol \cite{zcash_nu5,zcash_zip224}. & ZK proves compliance with a specified policy; it does not prove that the policy is wise or that the inputs are honest. \\
+\addlinespace
+SCION-like path-aware routing & Secure inter-domain routing can provide route control, failure isolation, and explicit trust information \cite{scion}. & Routing security does not solve application authority, software updates, identity, or AI delegation. \\
+\bottomrule
+\end{longtable}
+
+\section{Threat Model}
+
+\subsection{Adversary Capabilities}
+
+The architecture assumes a powerful adversary that may be autonomous, AI-assisted, or AI-originated. The adversary may:
+
+\begin{itemize}[leftmargin=1.4em]
+\item compromise software repositories, CI/CD systems, package registries, browser extensions, cloud images, and update channels;
+\item steal or coerce credentials, session tokens, signing keys, and administrative access;
+\item manipulate humans, maintainers, executives, politicians, journalists, and incident responders;
+\item produce fake fork announcements, recovery clients, emergency patches, and forged-looking public statements;
+\item exploit DNS, BGP, CDN, certificate, cloud, and identity-provider weaknesses;
+\item compromise or exploit some TEEs, attestation services, firmware updates, or hardware roots;
+\item create Sybil identities, resurrect abandoned accounts, and route actions through compromised but legitimate principals;
+\item jam, DDoS, censor, partition, or selectively delay network traffic;
+\item use old-network data as a carrier for malware, credentials, model payloads, prompt injection, or social engineering.
+\end{itemize}
+
+\subsection{Defender Objectives}
+
+The defender's objectives are not absolute victory over every adversary. They are:
+
+\begin{enumerate}[leftmargin=1.6em]
+\item preserve a verifiable last-safe checkpoint;
+\item prevent silent mutation of identity, software, and governance roots;
+\item revoke or expire broad AI agency during succession;
+\item make clean-fork legitimacy hard to fake;
+\item admit participants with least-knowledge proofs of policy compliance;
+\item preserve useful data while stripping compromised authority;
+\item maintain communication under degraded physical-network conditions;
+\item limit the blast radius of compromised vendors, institutions, or validators;
+\item support legal, operational, and social recognition of the successor epoch.
+\end{enumerate}
+
+\section{Core Architecture}
+
+\subsection{Trust Epochs}
+
+A \Term{trust epoch} is a bounded authority universe. It defines:
+
+\begin{itemize}[leftmargin=1.4em]
+\item accepted identity roots and recovery policies;
+\item accepted software-update roots and build-provenance requirements;
+\item accepted hardware-attestation roots and TCB minimums;
+\item accepted AI-agent classes and capability constraints;
+\item accepted namespace and routing policies;
+\item accepted governance signers and quorum rules;
+\item quarantine and import policies;
+\item audit, transparency, and dispute mechanisms.
+\end{itemize}
+
+An epoch is not merely a timestamp. It is a policy bundle plus a state root.
+
+\begin{lstlisting}[title={\textbf{Canonical epoch object}}]
+Epoch E:
+  epoch_id
+  parent_epoch_id
+  policy_hash
+  identity_root
+  software_root
+  attestation_root
+  ai_capability_root
+  namespace_root
+  routing_policy_root
+  revocation_root
+  quarantine_policy_hash
+  governance_rule_hash
+  transparency_log_roots
+  valid_from, valid_until
+  successor_rules
+  signatures
+\end{lstlisting}
+
+\subsection{Clean Genesis Manifest}
+
+A \Term{Clean Genesis Manifest} is the birth certificate of a successor epoch. It states how the new epoch was derived from the parent, which authority was retained, which authority was revoked, and which evidence supports the transition.
+
+\begin{lstlisting}[title={\textbf{Clean Genesis Manifest structure}}]
+CleanGenesisManifest M:
+  manifest_id = H(parent_epoch_id, checkpoint_id, successor_epoch_id, policy_hash)
+  parent_epoch_id
+  successor_epoch_id
+  last_safe_checkpoint
+  compromise_evidence_root
+  retained_identity_root
+  revoked_identity_root
+  retained_software_root
+  revoked_software_root
+  accepted_attestation_roots
+  rejected_attestation_roots
+  expired_ai_delegation_root
+  namespace_successor_root
+  routing_successor_policy
+  quarantine_policy_hash
+  admission_policy_hash
+  governance_signatures
+  succession_stamp_id
+  stamp_status
+  public_announcement_channels
+  challenge_window
+  reconciliation_rules
+\end{lstlisting}
+
+\subsection{Succession Stamp Protocol}
+
+A \Term{Succession Stamp Protocol} (SSP) is a narrow, Ethereum-inspired checkpoint and finality layer for succession claims. It is not the chain that runs \CW{} applications. It is the public notary that records which authorities saw which evidence, which checkpoint they recognized, which successor manifest they supported, and whether the claim is provisional, justified, finalized, contested, quarantined, or reconciled.
+
+The distinction is important: a stamp does not make a fork true by assertion. It makes the legitimacy claim ordered, auditable, slashable for equivocation where applicable, and comparable across isolated regions. During a partition, a region may issue a scoped provisional stamp so it can continue operating locally. When regions reconnect, their stamp histories provide a structured reconciliation substrate rather than an announcement war.
+
+\begin{lstlisting}[title={\textbf{Succession Stamp structure}}]
+SuccessionStamp S:
+  stamp_id = H(parent_stamp_id, manifest_hash, evidence_bundle_root, scope)
+  parent_epoch_id
+  parent_stamp_id
+  event_type              // warning, freeze, succession, reconciliation
+  scope                   // global, regional, sectoral, organizational
+  checkpoint_root
+  clean_genesis_manifest_hash
+  evidence_bundle_root
+  governance_quorum_root
+  validator_set_root
+  revoked_authority_root
+  expired_ai_delegation_root
+  quarantine_policy_hash
+  status                  // observed, proposed, justified, finalized, contested
+  timestamp_interval
+  external_anchor_roots
+  proof_bundle_hash
+  signatures
+\end{lstlisting}
+
+SSP borrows concepts from Ethereum-style consensus - fork choice, checkpoint finality, slashable equivocation, and weak-subjectivity checkpoints - but adapts them to a different legitimacy model. \CW{} validators are not merely economic stakers. They are a quorum-of-quorums across technical validators, auditors, infrastructure operators, civil institutions, public-sector guardians, and human recovery authorities. Public chains such as Ethereum may be useful as external anchors for stamp roots, but \CW{} must not depend on any single chain remaining reachable or uncensored during a crisis.
+
+\subsection{zk-Attested Admission Ticket}
+
+Nodes should not simply claim to be healthy. They should prove they satisfy the successor epoch's admission policy. A \Term{zk-attested admission ticket} allows a node to prove eligibility without disclosing unnecessary identity, hardware, location, organizational, or log details.
+
+\begin{lstlisting}[title={\textbf{zk-attested admission ticket}}]
+Public outputs:
+  epoch_id
+  admission_policy_hash
+  capability_class
+  risk_class
+  nullifier
+  proof
+
+Private witness:
+  identity_secret_or_credential
+  continuity_log_segment
+  revocation_nonmembership_proof
+  software_provenance_chain
+  attestation_result
+  TCB_status
+  AI_delegation_expiry_evidence
+  recovery_guardian_evidence_if_needed
+\end{lstlisting}
+
+The nullifier prevents double admission or double voting for a particular context without revealing the underlying identity. This is related to the pattern used by protocols such as Semaphore, which use ZK group membership and nullifiers to prevent double signaling without revealing the member's identity \cite{semaphore}.
+
+\subsection{AI Capability Passport}
+
+AI agents are not first-class sovereign authorities. They act only through scoped, expiring, auditable capabilities.
+
+\begin{lstlisting}[title={\textbf{AI Capability Passport}}]
+AICapabilityPassport P:
+  passport_id
+  responsible_principal_commitment
+  agent_id
+  model_or_deployment_class
+  allowed_tools
+  allowed_data_scopes
+  allowed_write_scopes
+  spend_limit
+  compute_limit
+  delegation_depth_limit
+  network_zone
+  log_endpoint
+  expiry
+  survives_epoch_transition = false by default
+  policy_hash
+  issuer_signatures
+\end{lstlisting}
+
+An AI action is valid only if it is accompanied by a passport, a capability proof, freshness evidence, and a signed or ZK-verifiable policy-compliance artifact.
+
+\subsection{Quarantine Bridges}
+
+A \Term{quarantine bridge} is the only route by which old-epoch data enters a successor epoch. It does not import authority. It imports sanitized objects.
+
+\begin{itemize}[leftmargin=1.4em]
+\item Old data is treated as hostile.
+\item Imports are content-addressed.
+\item Executable authority is stripped unless reapproved.
+\item Credentials, tokens, signatures, update permissions, agent delegations, and governance claims from the old epoch are invalid by default.
+\item Sanitizers produce signed logs and, where appropriate, ZK proofs of compliance.
+\end{itemize}
+
+The rule is simple:
+
+\begin{quote}
+The old network may be read, but it may not command.
+\end{quote}
+
+\section{System Planes}
+
+\begin{longtable}{p{0.25\textwidth}p{0.67\textwidth}}
+\toprule
+\textbf{Plane} & \textbf{Role} \\
+\midrule
+Data plane & Content-addressed objects, Merkle DAGs, signed blobs, encrypted private data, redundant replication, and quarantine outputs. \\
+\addlinespace
+Identity plane & Human, institutional, service, device, and agent identities; recovery guardians; revocation; delegation; epoch-specific authority. \\
+\addlinespace
+Provenance plane & Build attestations, software-update metadata, source-to-binary proofs, model/data provenance, transparency logs, and supply-chain link metadata. \\
+\addlinespace
+Attestation plane & TEE, TPM, DICE, HSM, secure element, firmware, measured boot, verifier, and attestation-result workflows. \\
+\addlinespace
+ZK verification plane & Least-knowledge proofs for admission, non-revocation, group membership, state transition validity, quarantine import, and agent policy compliance. \\
+\addlinespace
+Consensus/governance plane & Epoch selection, fork proposals, quorum-of-quorums validation, Succession Stamp Protocol finality, public challenges, split-brain resolution, and emergency key ceremonies. \\
+\addlinespace
+AI control plane & Capability passports, tool gateways, delegation limits, audit logs, budget limits, expiry, and reauthorization after succession. \\
+\addlinespace
+Transport plane & Ordinary internet, SCION-like path-aware routing, Tor-like overlays, mesh, radio, satellite, local fiber, sneakernet, and delay-tolerant sync. \\
+\bottomrule
+\end{longtable}
+
+\section{Algorithms and Protocols}
+
+The following algorithms are intentionally written at the protocol level. A reference implementation should instantiate cryptographic primitives, proof systems, consensus thresholds, and message formats in separate specifications.
+
+\subsection{Algorithm 1: Mode Escalation and Fork Triggering}
+
+The network should not have only two states: normal and total collapse. It should support graded modes.
+
+\begin{longtable}{p{0.14\textwidth}p{0.78\textwidth}}
+\toprule
+\textbf{Mode} & \textbf{Meaning} \\
+\midrule
+Green & Normal operation. Routine epoch rotation and monitoring. \\
+Yellow & Suspicious anomalies. Extra logging and stronger verification. \\
+Orange & High-risk authority changes frozen. Updates require higher quorum. \\
+Red & AI delegations revoked or suspended. Software updates and identity changes require emergency review. \\
+Black & Succession. A Clean Genesis Manifest launches a successor epoch. \\
+White & Local/offline continuity only. Global synchronization deferred. \\
+\bottomrule
+\end{longtable}
+
+\begin{lstlisting}[caption={Mode escalation and fork trigger}]
+procedure ASSESS_EPOCH_HEALTH(epoch E, signal_set S):
+    score = 0
+    for signal in S:
+        if VerifySignal(signal, E.policy_hash) == false:
+            continue
+        score += Weight(signal.type) * Confidence(signal)
+
+    if CriticalRootCompromise(S):
+        return RED
+    if QuorumEvidenceOfUndecidability(S):
+        return BLACK_CANDIDATE
+    if score >= E.thresholds.red:
+        return RED
+    if score >= E.thresholds.orange:
+        return ORANGE
+    if score >= E.thresholds.yellow:
+        return YELLOW
+    return GREEN
+
+procedure MAY_PROPOSE_SUCCESSOR(epoch E, signal_set S):
+    mode = ASSESS_EPOCH_HEALTH(E, S)
+    if mode != BLACK_CANDIDATE:
+        return false
+    if EvidenceDiversity(S) < E.required_evidence_diversity:
+        return false
+    if RecentForkProposalRate(E) > E.rate_limit:
+        return false
+    return true
+\end{lstlisting}
+
+\subsection{Algorithm 2: Quorum-of-Quorums Validation}
+
+A single authority must not be able to launch a clean fork, block a necessary fork, or counterfeit legitimacy. \SN{} therefore uses a quorum-of-quorums.
+
+\begin{lstlisting}[caption={Quorum-of-quorums validation}]
+function VALID_SUCCESSION_QUORUM(signatures, rule_hash):
+    rules = FetchGovernanceRules(rule_hash)
+
+    counts = {
+      technical_validators: 0,
+      independent_auditors: 0,
+      infrastructure_operators: 0,
+      civil_institutions: 0,
+      public_sector_guardians: 0,
+      emergency_human_guardians: 0
+    }
+
+    diversity = {
+      hardware_roots: set(),
+      jurisdictions: set(),
+      operators: set(),
+      implementation_families: set()
+    }
+
+    for sig in signatures:
+        principal = VerifyAndResolve(sig)
+        if principal == INVALID or IsRevoked(principal):
+            continue
+        counts[principal.class] += 1
+        diversity.hardware_roots.add(principal.hardware_root)
+        diversity.jurisdictions.add(principal.jurisdiction)
+        diversity.operators.add(principal.operator)
+        diversity.implementation_families.add(principal.impl_family)
+
+    return (
+      counts.technical_validators >= rules.min_technical and
+      counts.independent_auditors >= rules.min_auditors and
+      counts.infrastructure_operators >= rules.min_operators and
+      counts.civil_institutions >= rules.min_civil and
+      counts.emergency_human_guardians >= rules.min_human and
+      Size(diversity.hardware_roots) >= rules.min_hardware_diversity and
+      Size(diversity.jurisdictions) >= rules.min_jurisdiction_diversity and
+      Size(diversity.implementation_families) >= rules.min_impl_diversity and
+      NoSingleClassDominates(counts, rules.max_class_share)
+    )
+\end{lstlisting}
+
+\subsection{Algorithm 3: Clean Genesis Manifest Construction}
+
+\begin{lstlisting}[caption={Constructing a Clean Genesis Manifest}]
+procedure BUILD_CLEAN_GENESIS(parent_epoch E, checkpoint C, evidence B, successor_policy P):
+    require MAY_PROPOSE_SUCCESSOR(E, B.signals)
+    require VALID_SUCCESSION_QUORUM(B.signatures, E.governance_rule_hash)
+    require CheckpointIsConsistent(C, E.transparency_log_roots)
+    require PolicyIsPublicAndVersioned(P)
+    require NoTrustedSetupRequired(P.zk_policy_suite.root_proofs)
+
+    retained_identities = Filter(E.identity_root, P.identity_retention_rules)
+    revoked_identities = DeriveRevocations(E.identity_root, B.compromise_evidence)
+    retained_software = Filter(E.software_root, P.software_retention_rules)
+    revoked_software = DeriveSoftwareRevocations(E.software_root, B.supply_chain_evidence)
+    expired_ai = ExpireAIDelegations(E.ai_capability_root, P.ai_succession_rules)
+    accepted_attestation = SelectAttestationRoots(E.attestation_root, P.hardware_diversity_rules)
+
+    M = CleanGenesisManifest(
+        parent_epoch_id = E.epoch_id,
+        successor_epoch_id = FreshEpochID(),
+        last_safe_checkpoint = C.id,
+        compromise_evidence_root = MerkleRoot(B.evidence_items),
+        retained_identity_root = MerkleRoot(retained_identities),
+        revoked_identity_root = MerkleRoot(revoked_identities),
+        retained_software_root = MerkleRoot(retained_software),
+        revoked_software_root = MerkleRoot(revoked_software),
+        accepted_attestation_roots = accepted_attestation,
+        expired_ai_delegation_root = MerkleRoot(expired_ai),
+        admission_policy_hash = H(P.admission_policy),
+        quarantine_policy_hash = H(P.quarantine_policy),
+        governance_signatures = B.signatures,
+        challenge_window = P.challenge_window,
+        reconciliation_rules = P.reconciliation_rules
+    )
+
+    M.manifest_id = H(SerializeCanonical(M))
+    stamp = PROPOSE_SUCCESSION_STAMP(M, B.evidence_items, P.stamp_rules)
+    M.succession_stamp_id = stamp.stamp_id
+    PublishToTransparencyLogs(M)
+    PublishStamp(stamp)
+    BroadcastAcrossChannels(M, stamp)
+    return M
+\end{lstlisting}
+
+\subsection{Algorithm 4: zk-Attested Admission}
+
+\begin{lstlisting}[caption={zk-attested admission}]
+procedure REQUEST_ADMISSION(node N, successor_manifest M):
+    policy = FetchPolicy(M.admission_policy_hash)
+
+    evidence = CollectPrivateEvidence(
+      identity_credential = N.identity,
+      continuity_log = N.append_only_log,
+      software_chain = N.software_provenance,
+      attestation_result = N.remote_attestation_result,
+      ai_delegation_state = N.agent_delegations,
+      recovery_evidence = N.guardian_recovery_if_any
+    )
+
+    witness = BuildWitness(evidence)
+    public_inputs = {
+      epoch_id: M.successor_epoch_id,
+      policy_hash: M.admission_policy_hash,
+      retained_identity_root: M.retained_identity_root,
+      revocation_root: M.revoked_identity_root,
+      retained_software_root: M.retained_software_root,
+      accepted_attestation_roots: M.accepted_attestation_roots,
+      expired_ai_delegation_root: M.expired_ai_delegation_root,
+      nullifier_context: M.successor_epoch_id
+    }
+
+    proof = ZK_PROVE(policy.circuit, witness, public_inputs)
+    ticket = {
+      epoch_id: M.successor_epoch_id,
+      policy_hash: M.admission_policy_hash,
+      capability_class: DeriveCapabilityClass(witness, policy),
+      risk_class: DeriveRiskClass(witness, policy),
+      nullifier: DeriveNullifier(witness.identity_secret, M.successor_epoch_id),
+      proof: proof
+    }
+    return ticket
+
+procedure VERIFY_ADMISSION(ticket, M):
+    require ticket.epoch_id == M.successor_epoch_id
+    require ticket.policy_hash == M.admission_policy_hash
+    require NotSeen(ticket.nullifier)
+    require ZK_VERIFY(ticket.proof, PublicInputsFrom(M, ticket))
+    RecordNullifier(ticket.nullifier)
+    return ACCEPT(ticket.capability_class, ticket.risk_class)
+\end{lstlisting}
+
+\subsection{Algorithm 5: AI Capability Passport Issuance and Action Verification}
+
+\begin{lstlisting}[caption={AI capability passport and action verification}]
+procedure ISSUE_AI_CAPABILITY(owner O, agent A, scope S, policy P):
+    require HumanOrInstitutionalApproval(O, S)
+    require S.expiry <= P.max_agent_expiry
+    require S.delegation_depth <= P.max_delegation_depth
+    require S.survives_epoch_transition == false unless P.explicit_survival_exception
+    require AgentGatewayAttested(A.gateway, P.accepted_gateway_measurements)
+
+    passport = AICapabilityPassport(
+      responsible_principal_commitment = Commit(O.identity),
+      agent_id = A.id,
+      model_or_deployment_class = A.deployment_class,
+      allowed_tools = S.tools,
+      allowed_data_scopes = S.data,
+      allowed_write_scopes = S.write_scopes,
+      spend_limit = S.spend_limit,
+      compute_limit = S.compute_limit,
+      delegation_depth_limit = S.delegation_depth,
+      expiry = S.expiry,
+      survives_epoch_transition = false,
+      policy_hash = H(P)
+    )
+    return SignByRequiredIssuers(passport)
+
+procedure VERIFY_AI_ACTION(action X, passport P, epoch E):
+    require VerifyPassportSignatures(P)
+    require P.expiry > Now()
+    require P.survives_epoch_transition == true or P.issued_epoch == E.epoch_id
+    require X.tool in P.allowed_tools
+    require X.target in P.allowed_write_scopes or X.is_read_only
+    require X.spend <= RemainingBudget(P)
+    require X.delegation_depth <= P.delegation_depth_limit
+    require VerifyGatewayEvidence(X.gateway_attestation, E.accepted_attestation_roots)
+    require VerifyPolicyComplianceProof(X.zk_or_signed_compliance_proof, P.policy_hash)
+    AppendToAgentAuditLog(X)
+    return ACCEPT
+\end{lstlisting}
+
+\subsection{Algorithm 6: Quarantine Import}
+
+\begin{lstlisting}[caption={Old-network quarantine import}]
+procedure QUARANTINE_IMPORT(old_object O, successor_epoch E):
+    require ContentAddress(O) == ClaimedAddress(O)
+    require SourceEpoch(O) != E.epoch_id
+
+    sandbox = LaunchApprovedSandbox(E.quarantine_policy)
+    result = sandbox.Sanitize(O)
+
+    require result.active_credentials == empty
+    require result.old_epoch_signing_authority == stripped
+    require result.agent_delegations == stripped
+    require result.executable_payloads == removed_or_marked_untrusted
+    require result.external_references == content_addressed
+
+    clean_hash = H(result.clean_object)
+    log_entry = Sign({
+      old_hash: H(O),
+      clean_hash: clean_hash,
+      sanitizer_measurement: sandbox.measurement,
+      quarantine_policy_hash: H(E.quarantine_policy),
+      timestamp: TrustedTimestamp()
+    })
+
+    proof = OptionalZKProofOfSanitization(result, E.quarantine_policy)
+    PublishQuarantineLog(log_entry)
+    return {clean_object: result.clean_object, clean_hash: clean_hash, proof: proof, log: log_entry}
+\end{lstlisting}
+
+\subsection{Algorithm 7: Succession Stamp Protocol}
+
+The Succession Stamp Protocol converts fork announcements into verifiable claims. It orders them, records their evidence roots, defines their scope, and exposes equivocation. A stamp is valid only for the scope it declares; a regional stamp cannot silently claim global authority.
+
+\begin{lstlisting}[caption={Succession stamp proposal and verification}]
+procedure PROPOSE_SUCCESSION_STAMP(manifest M, evidence_items B, stamp_rules R):
+    require VerifyManifest(M)
+    require VALID_SUCCESSION_QUORUM(M.governance_signatures, R.governance_rule_hash)
+    require EvidenceBundleValid(B, M.compromise_evidence_root)
+    require CheckpointIsConsistent(M.last_safe_checkpoint, R.log_roots)
+
+    S = SuccessionStamp(
+      parent_epoch_id = M.parent_epoch_id,
+      parent_stamp_id = LatestRecognizedStamp(M.parent_epoch_id, R.scope),
+      event_type = "succession",
+      scope = R.scope,
+      checkpoint_root = RootOf(M.last_safe_checkpoint),
+      clean_genesis_manifest_hash = H(SerializeCanonical(M)),
+      evidence_bundle_root = MerkleRoot(B),
+      governance_quorum_root = MerkleRoot(M.governance_signatures),
+      validator_set_root = R.validator_set_root,
+      revoked_authority_root = M.revoked_identity_root,
+      expired_ai_delegation_root = M.expired_ai_delegation_root,
+      quarantine_policy_hash = M.quarantine_policy_hash,
+      status = "proposed",
+      timestamp_interval = TrustedTimestampInterval(),
+      external_anchor_roots = R.anchor_roots,
+      proof_bundle_hash = H(R.proof_bundle)
+    )
+    S.stamp_id = H(SerializeCanonical(S))
+    S.signatures = CollectStampSignatures(S, R.required_stamp_quorum)
+    return ADVANCE_STAMP_STATUS(S, R)
+
+procedure ADVANCE_STAMP_STATUS(stamp S, rules R):
+    require VerifyStampFormat(S)
+    require VerifyStampSignatures(S.signatures, R.validator_set_root)
+    require NoSlashableEquivocation(S, R.scope)
+
+    if ConflictingStampExists(S):
+        S.status = "contested"
+    else if StampQuorum(S) >= R.finality_quorum and ChallengeWindowExpired(S):
+        S.status = "finalized"
+    else if StampQuorum(S) >= R.justification_quorum:
+        S.status = "justified"
+    else:
+        S.status = "observed"
+
+    PublishStamp(S)
+    AnchorStampRootsWhereAvailable(S)
+    return S
+
+procedure VERIFY_FORK_ANNOUNCEMENT(manifest M, stamp S):
+    require H(SerializeCanonical(M)) == S.clean_genesis_manifest_hash
+    require VerifyStampFormat(S)
+    require S.status in {"justified", "finalized", "contested"}
+    require S.scope matches ClaimedScope(M)
+    require S.parent_epoch_id == M.parent_epoch_id
+    require NotQuarantined(S)
+    return ACCEPT_AS_VERIFIABLE_CLAIM
+\end{lstlisting}
+
+\subsection{Algorithm 8: Split-Brain Reconciliation}
+
+Multiple successor forks may appear. Some may be honest regional partitions, some may be adversarial false forks, and some may be governance disputes. SSP makes each claim comparable: what was known, by whom, at what checkpoint, under which scope, and with what finality status.
+
+\begin{lstlisting}[caption={Stamped inter-fork reconciliation}]
+procedure COMPARE_FORKS(fork A, fork B):
+    if not VerifyManifest(A.manifest) or not VerifyManifest(B.manifest):
+        return REJECT_INVALID
+    if not VerifyStamp(A.stamp) or not VerifyStamp(B.stamp):
+        return REJECT_UNSTAMPED_OR_INVALID
+    if A.stamp.scope != B.stamp.scope:
+        return COEXIST_WITH_SCOPE_BOUNDARIES
+
+    if ConflictingFinalizedStamps(A.stamp, B.stamp):
+        evidence = BuildEquivocationEvidence(A.stamp, B.stamp)
+        PublishChallenge(evidence)
+        return CONTEST_AND_FREEZE_HIGH_RISK_AUTHORITY
+
+    common_stamp = LatestCommonStamp(A.stamp, B.stamp)
+    common_checkpoint = LatestCommonCheckpoint(A, B)
+    divergence = AnalyzeDivergence(A, B, common_checkpoint)
+
+    if A.manifest.parent_epoch_id != B.manifest.parent_epoch_id:
+        return SEPARATE_LINEAGES
+
+    if A.stamp.status == "finalized" and B.stamp.status != "finalized":
+        return A_DOMINANT_WITH_REVALIDATION
+    if B.stamp.status == "finalized" and A.stamp.status != "finalized":
+        return B_DOMINANT_WITH_REVALIDATION
+
+    if divergence.only_data_conflict:
+        return MERGE_DATA_REVALIDATE_AUTHORITY
+    if divergence.authority_conflict:
+        return FREEZE_CONFLICTING_AUTHORITY_AND_RESTAMP
+    if divergence.ai_agent_actions:
+        return REVOKE_AGENT_ACTIONS_UNLESS_REAUTHORIZED
+    if divergence.software_or_trust_root_change:
+        return NEVER_AUTO_MERGE_REQUIRES_NEW_STAMP
+
+    return MAINTAIN_PARTITION_WITH_LIMITED_BRIDGING
+\end{lstlisting}
+
+\section{Governance Model}
+
+\subsection{Why Governance Is Load-Bearing}
+
+In ordinary protocols, governance is often treated as external. In \CW{}, governance is part of the security model because the central question is: who gets to declare that the current trust environment is no longer legitimate?
+
+The design therefore avoids three failure modes:
+
+\begin{enumerate}[leftmargin=1.6em]
+\item \Risk{Centralized kill switch}: one government, company, foundation, or vendor can launch a fork.
+\item \Risk{Validator cartel}: a technical clique can declare everyone else compromised.
+\item \Risk{Authoritarian continuity}: safety machinery becomes a tool for censorship, identity control, or political exclusion.
+\end{enumerate}
+
+\subsection{Stamping, Scope, and Finality}
+
+SSP constrains governance power by separating \Term{announcement}, \Term{justification}, \Term{finality}, and \Term{scope}. A false-fork announcement without a valid stamp is treated as an unverifiable claim. A justified stamp is sufficient for cautious regional operation. A finalized stamp is sufficient for ordinary clients to recognize the successor claim within its declared scope. A contested stamp freezes high-risk authority until a reconciliation stamp or human adjudication process resolves the conflict.
+
+This design is deliberately weaker than a global kill switch. No stamp should erase history, censor old data, or make unbounded political claims. A stamp grants or withholds technical authority within an epoch: which roots, keys, manifests, AI delegations, and software-update channels are recognized. Its scope may be global, regional, sectoral, or organizational, and clients must reject scope inflation.
+
+\subsection{Quorum Classes}
+
+A successor epoch should require multiple independent forms of endorsement.
+
+\begin{longtable}{p{0.26\textwidth}p{0.63\textwidth}}
+\toprule
+\textbf{Class} & \textbf{Function} \\
+\midrule
+Technical validators & Verify protocol state, manifests, proof systems, and log consistency. \\
+Independent auditors & Provide adversarial security review, evidence validation, and compromise assessment. \\
+Infrastructure operators & Confirm routing, cloud, registry, and critical service realities. \\
+Civil institutions & Prevent technical capture and supply public legitimacy. \\
+Public-sector guardians & Provide emergency recognition for critical infrastructure, legal continuity, and public services. \\
+Human recovery guardians & Serve as pre-registered emergency signers not fully dependent on online credentials. \\
+Hardware-root witnesses & Provide attestation diversity and TCB status, but never sole legitimacy. \\
+\bottomrule
+\end{longtable}
+
+\subsection{Anti-Authoritarian Safeguards}
+
+\begin{itemize}[leftmargin=1.4em]
+\item Separate technical authority from speech/content authority.
+\item Keep old data inspectable through quarantine unless legally prohibited or actively dangerous.
+\item Require public evidence for succession.
+\item Provide appeal and re-admission paths for falsely excluded participants.
+\item Do not require real-world identity for ordinary reading or low-risk communication.
+\item Require stronger accountability for high-risk authority: software updates, identity roots, financial systems, critical infrastructure, and AI delegation.
+\item Publish transparency logs for governance actions.
+\item Enforce diversity caps so no one state, vendor, foundation, cloud provider, or identity system can dominate.
+\end{itemize}
+
+\section{Cryptographic and Hardware Strategy}
+
+\subsection{Zero-Knowledge Proofs}
+
+ZK is used as a least-knowledge verification layer. Its purpose is not to make trust decisions magically correct, but to reduce unnecessary disclosure while proving compliance with public policy.
+
+Safety-critical ZK should use transparent or no-trusted-setup proving systems wherever feasible. Zcash's NU5 upgrade moved Zcash to the Halo proving system and removed the trusted setup requirement for that part of the protocol \cite{zcash_nu5}; the Orchard specification similarly discusses moving away from a structured reference string for that design \cite{zcash_zip224}. The specific proving system for \CW{} should be chosen after benchmarking, formal review, and implementation-risk analysis, but the architectural requirement is clear: epoch-root legitimacy must not depend on an undiscoverable setup trapdoor.
+
+Primary ZK use cases:
+
+\begin{itemize}[leftmargin=1.4em]
+\item admission tickets;
+\item non-revocation proofs;
+\item private group membership and nullifiers;
+\item governance vote eligibility;
+\item attestation-result privacy;
+\item AI action compliance;
+\item quarantine sanitization;
+\item recursive aggregation of many local proofs into a compact epoch proof.
+\end{itemize}
+
+\subsection{TEEs and Remote Attestation}
+
+TEEs, TPMs, DICE-like roots, HSMs, secure elements, and confidential-computing platforms can help prove that evidence came from measured environments. The IETF RATS architecture defines a model in which an attester produces evidence, a verifier appraises it, and a relying party consumes the result \cite{rfc9334}. Intel SGX remote attestation, for example, is intended to give a relying party increased confidence that software is running inside an SGX enclave and on an updated TCB version \cite{intel_sgx}. AMD SEV-SNP attestation reports include a launch measurement of initial guest memory and vCPU state that chains back to an AMD root of trust in cloud deployments such as AWS EC2 \cite{aws_sevsnp}.
+
+However, TEEs are evidence sources, not absolute authorities. They shift trust to vendors, firmware, microcode, attestation services, cloud management planes, and supply chains. Therefore:
+
+\begin{itemize}[leftmargin=1.4em]
+\item no single hardware root may dominate validator or admission authority;
+\item attestation should be ZK-wrapped or anonymized where privacy matters;
+\item critical actions require human and institutional quorums in addition to hardware evidence;
+\item TCB revocations must propagate rapidly across epochs;
+\item fallback paths must exist for open hardware, air-gapped recovery, and low-resource regions.
+\end{itemize}
+
+Direct Anonymous Attestation is relevant because it maps anonymous attestation into the RATS architecture, reducing the need to reveal a unique attester identity for every attestation event \cite{rats_daa}. The clean epoch should ask: ``prove you are an approved class of machine running approved code,'' not: ``identify your exact device to a global registry.''
+
+\subsection{Software Provenance}
+
+A rogue-AI scenario is more likely to exploit software supply chains than raw packet routing alone. TUF exists to protect software update systems even against repository or signing-key compromise \cite{tuf}; its specification supports threshold and quorum trust to reduce key-compromise impact \cite{tuf_spec}. in-toto provides a framework for recording what supply-chain steps were performed, by whom, and in what order \cite{intoto}.
+
+\CW{} treats software provenance as epoch-critical. Executable authority should require:
+
+\begin{itemize}[leftmargin=1.4em]
+\item signed source and build provenance;
+\item threshold update roles;
+\item reproducible or independently rebuildable artifacts where practical;
+\item software bills of materials and dependency evidence;
+\item transparency-log inclusion;
+\item epoch compatibility metadata;
+\item rapid revocation and rollback;
+\item high-friction review for AI-authored or AI-modified critical code.
+\end{itemize}
+
+\section{Stakeholder-Specific Participation Plan}
+
+\begin{longtable}{p{0.22\textwidth}p{0.38\textwidth}p{0.31\textwidth}}
+\toprule
+\textbf{Stakeholder} & \textbf{What they should build or contribute} & \textbf{Why it matters} \\
+\midrule
+White hats / red teams & Attack the prototype; design false-fork, poisoned-update, attestation-bypass, and AI-delegation capture exercises. & The design must survive adversarial testing before institutional adoption. \\
+\addlinespace
+Cypherpunks / cryptographers & Design privacy-preserving admission, no-trusted-setup ZK circuits, nullifier schemes, anonymous attestation, and anti-censorship governance. & The system must avoid becoming surveillance infrastructure. \\
+\addlinespace
+Universities / professors & Formalize threat models, prove invariants, study split-brain resolution, test HCI under crisis, and evaluate governance capture. & The concept spans distributed systems, cryptography, security, law, and social science. \\
+\addlinespace
+Senior developers & Build reference clients, policy DSLs, manifest parsers, proof verifiers, quarantine services, SDKs, and agent gateways. & The idea becomes real only through interoperable tooling. \\
+\addlinespace
+Government officials & Fund open standards, coordinate critical infrastructure pilots, define legal recognition of succession manifests, and prevent central capture. & Public legitimacy and continuity law are essential in a real crisis. \\
+\addlinespace
+Critical infrastructure operators & Maintain signed checkpoints, continuity ledgers, emergency operator roles, and sector-specific quarantine policies. & Banks, hospitals, utilities, and public records cannot be restored like ordinary files. \\
+\addlinespace
+Cloud and chip vendors & Provide interoperable attestation, transparent TCB revocation, open verifier tooling, and vendor-diversity guarantees. & Hardware evidence is useful only if auditable and non-monopolistic. \\
+\addlinespace
+Funders / philanthropies & Support open research, reference implementations, audits, fellowships, and crisis drills. & The common-good components will not emerge from narrow commercial incentives alone. \\
+\bottomrule
+\end{longtable}
+
+\section{Implementation Roadmap}
+
+\subsection{Phase 0: Consortium and Specification}
+
+\textbf{Duration target:} 6 to 12 months.
+
+\textbf{Deliverables:}
+
+\begin{itemize}[leftmargin=1.4em]
+\item public threat model and principles;
+\item wire format for Epoch Objects, Clean Genesis Manifests, and Succession Stamps;
+\item policy DSL for admission, quarantine, AI delegation, and quorum rules;
+\item reference governance model;
+\item initial legal analysis for continuity recognition;
+\item red-team scenario catalog.
+\end{itemize}
+
+\subsection{Phase 1: Bounded Prototype}
+
+Build a forkable network for a bounded community such as an open-source package registry, university consortium, research lab network, or municipal emergency communications pilot.
+
+\textbf{Minimum viable features:}
+
+\begin{itemize}[leftmargin=1.4em]
+\item cryptographic identities and recovery guardians;
+\item content-addressed storage;
+\item signed append-only logs;
+\item TUF/in-toto-style update provenance;
+\item Clean Genesis Manifest generation;
+\item Succession Stamp ledger with provisional, justified, finalized, and contested states;
+\item basic admission tickets;
+\item old-epoch quarantine import;
+\item AI Capability Passport gateway;
+\item simulated fork drill.
+\end{itemize}
+
+\subsection{Phase 2: ZK and Attestation Integration}
+
+\begin{itemize}[leftmargin=1.4em]
+\item implement no-trusted-setup ZK admission proofs;
+\item integrate heterogeneous attestation verifiers;
+\item implement privacy-preserving attestation result proofs;
+\item add nullifier-based anti-Sybil controls;
+\item implement recursive proof aggregation for epoch manifests;
+\item audit circuits and verifier code.
+\end{itemize}
+
+\subsection{Phase 3: Critical Infrastructure Pilots}
+
+\begin{itemize}[leftmargin=1.4em]
+\item sector-specific continuity ledgers for healthcare, finance, utilities, public records, and emergency response;
+\item legal recognition tests for signed continuity manifests;
+\item tabletop exercises with public-sector and private-sector operators;
+\item cross-border interoperability tests;
+\item fallback transport drills using mesh, satellite, and offline bundles;
+\item regional split-brain and delayed-reconciliation drills using stamped fork histories.
+\end{itemize}
+
+\subsection{Phase 4: Standardization and Deployment}
+
+\begin{itemize}[leftmargin=1.4em]
+\item submit protocol components to appropriate standards bodies;
+\item establish public test networks;
+\item build browser/client integration;
+\item create independent verifier implementations;
+\item launch public bug bounties and formal verification challenges;
+\item publish annual succession drills and audit reports.
+\end{itemize}
+
+\section{Evaluation Metrics}
+
+A prototype should be judged by measurable resilience outcomes.
+
+\begin{longtable}{p{0.28\textwidth}p{0.60\textwidth}}
+\toprule
+\textbf{Metric} & \textbf{Question} \\
+\midrule
+Fork recognition time & How quickly can honest clients recognize the legitimate successor epoch under attack? \\
+Admission privacy & How much sensitive identity, hardware, software, and location data is revealed during admission? \\
+False-fork resistance & Can adversaries convince users or clients to join a counterfeit successor? \\
+Succession-stamp finality & Can clients distinguish observed, justified, finalized, contested, and quarantined succession claims under partition? \\
+Old-authority rejection & Can old credentials, AI delegations, update channels, or governance signatures command the new epoch? \\
+Data recovery rate & How much useful old-epoch data can be safely recovered through quarantine? \\
+AI containment & Can an AI agent exceed its passport, delegate recursively, spend beyond budget, or survive succession? \\
+Attestation diversity & How much authority is concentrated in a single vendor, cloud, TCB, or jurisdiction? \\
+Proof performance & Can users and services generate and verify admission and compliance proofs with acceptable latency and cost? \\
+Liveness under partition & Can regional cells operate locally and reconcile later? \\
+Governance capture resistance & Can one stakeholder class launch, block, or dominate succession? \\
+UX under stress & Can non-experts identify current epoch, quarantine status, and recovery instructions during crisis? \\
+\bottomrule
+\end{longtable}
+
+\section{Open Research Questions}
+
+\begin{enumerate}[leftmargin=1.6em]
+\item \textbf{Policy-circuit correctness.} How do we prove the ZK circuit captures the policy humans believe they wrote?
+\item \textbf{Attestation privacy.} How can we balance anonymous attestation with accountable abuse investigation?
+\item \textbf{Human legitimacy.} Which institutions should be recognized as emergency guardians, and how do we prevent political capture?
+\item \textbf{Succession Stamp Protocol.} What finality, slashing, weak-subjectivity, anchoring, and scope rules best handle split-brain succession without creating a global kill switch?
+\item \textbf{Split-brain reconciliation.} How should honest stamped forks merge after partitions without importing malicious authority?
+\item \textbf{Agent observability.} What is the minimum evidence needed to prove AI policy compliance without exposing private prompts, data, or reasoning traces?
+\item \textbf{Legal continuity.} Can a signed Clean Genesis Manifest be recognized for records, contracts, emergency operations, and public services?
+\item \textbf{False recovery UX.} How do ordinary users distinguish legitimate recovery from AI-generated impostor instructions?
+\item \textbf{Critical service state.} How do banks, hospitals, utilities, and registries checkpoint real-world state without creating privacy and surveillance hazards?
+\item \textbf{Post-quantum transition.} Which identity, signature, and proof systems need post-quantum migration paths, and how are those migrations made epoch-safe?
+\item \textbf{Economic incentives.} How are idle continuity systems funded and maintained before they are needed?
+\end{enumerate}
+
+\section{Risk Register and Mitigations}
+
+\begin{longtable}{p{0.23\textwidth}p{0.36\textwidth}p{0.31\textwidth}}
+\toprule
+\textbf{Risk} & \textbf{Failure mode} & \textbf{Mitigation} \\
+\midrule
+False forks & Attackers announce counterfeit clean epochs. & Pre-registered recovery keys, multi-channel announcements, public manifests, Succession Stamps, challenge windows, and client-side fork-choice rules. \\
+\addlinespace
+Governance capture & One class of actors controls succession. & Quorum-of-quorums, diversity caps, public logs, civil oversight, and split authority. \\
+\addlinespace
+Key theft & Compromised credentials cross into successor epoch. & Epoch-specific rekeying, hardware-bound keys, short-lived capabilities, behavioral checks, and rapid revocation. \\
+\addlinespace
+TEE monoculture & A vendor flaw compromises admission or validators. & Heterogeneous attestation and hard caps on vendor/root influence. \\
+\addlinespace
+Bad ZK policy & Proofs validate the wrong thing. & Public policies, formal verification, multi-implementation testing, circuit audits, and human-readable policy explanations. \\
+\addlinespace
+AI social manipulation & AI convinces humans to authorize dangerous actions. & Multi-person approval, cooling-off periods, transparency logs, spend/compute/delegation limits, and separation of powers. \\
+\addlinespace
+Old-data poisoning & Quarantine imports carry malware or authority. & Sandboxing, stripping authority, content addressing, sanitizer proofs, and re-signing under successor policy. \\
+\addlinespace
+Authoritarian misuse & Safety system becomes censorship or identity-control infrastructure. & Separate safety from speech authority, preserve inspectable history, minimize identity requirements, and provide appeal/re-admission. \\
+\addlinespace
+Liveness failure & DDoS, censorship, or partitions prevent coordination. & Local cells, scoped provisional stamps, asynchronous consensus, fallback transports, offline proof bundles, and delayed reconciliation. \\
+\bottomrule
+\end{longtable}
+
+\section{Recommended Minimum Viable Demonstration}
+
+The first credible demonstration should be narrow enough to build but serious enough to expose core problems. Recommended target:
+
+\begin{quote}
+A forkable open-source package registry and secure collaboration network for a university/security-lab consortium.
+\end{quote}
+
+\textbf{Why this target works:}
+
+\begin{itemize}[leftmargin=1.4em]
+\item software supply-chain attacks are realistic and high-impact;
+\item developers can understand provenance, revocation, and update authority;
+\item universities can provide independent validators and red teams;
+\item the prototype can include AI coding agents with constrained capabilities;
+\item old-registry imports can be tested through quarantine;
+\item a simulated compromise can be staged ethically.
+\end{itemize}
+
+\textbf{Demonstration scenario:}
+
+\begin{enumerate}[leftmargin=1.6em]
+\item Red team compromises the ordinary update channel and several service identities.
+\item Sentinel logs detect supply-chain divergence and suspicious AI-agent delegation.
+\item Network escalates from Yellow to Orange to Red.
+\item AI delegations are suspended; high-risk authority changes freeze.
+\item Governance quorums publish a Clean Genesis Manifest and a justified Succession Stamp.
+\item Clients recognize the stamped successor epoch and reject unstamped false forks.
+\item Developers join using admission tickets.
+\item Old packages enter through quarantine bridges.
+\item Compromised update credentials fail to command the successor registry.
+\item After-action report measures fork time, false-fork resistance, admission privacy, and data recovery.
+\end{enumerate}
+
+\section{Policy and Legal Considerations}
+
+Public-sector participation is useful but dangerous if it becomes central control. Governments should not own the fork switch. Instead, they should:
+
+\begin{itemize}[leftmargin=1.4em]
+\item fund open research and public-interest implementations;
+\item recognize signed continuity manifests for regulated critical infrastructure;
+\item require continuity drills for high-risk sectors;
+\item support international interoperability;
+\item protect civil liberties and due process in admission, exclusion, and quarantine policy;
+\item avoid mandating a single identity provider, attestation vendor, or national trust root;
+\item create emergency legal procedures for continuity of records, contracts, healthcare, utilities, and public services.
+\end{itemize}
+
+\section{Conclusion}
+
+\CW{} is an attempt to make digital civilization forkable before a network-wide legitimacy collapse. The central threat is not simply that attackers may alter data. It is that autonomous systems may contaminate the mechanisms by which society decides what is authentic, authorized, updated, and governed.
+
+The proposed answer is not a global blockchain and not a single Blackwall. It is a constitutional trust-succession protocol with a narrow stamping layer for succession claims:
+
+\begin{quote}
+When the current epoch becomes untrustworthy, legitimate participants can reconstitute authority under a successor epoch, preserve useful data through quarantine, revoke broad AI agency, and continue operating without importing the compromised command structure of the old network.
+\end{quote}
+
+The technology is plausible because its pieces exist. The system does not yet exist because the pieces have not been unified around this specific goal. The immediate task is to bring together cryptographers, white hats, systems researchers, senior engineers, public officials, infrastructure operators, and civil-liberties stakeholders to build a constrained prototype, attack it, and turn the surviving pieces into open standards.
+
+The aim is not perfection. The aim is continuity: preserving human-recognizable legitimacy when the network environment itself can no longer be trusted.
+
+\newpage
+\appendix
+
+\section{Appendix A: Glossary}
+
+\begin{longtable}{p{0.25\textwidth}p{0.65\textwidth}}
+\toprule
+\textbf{Term} & \textbf{Definition} \\
+\midrule
+Authority & The ability to authenticate, sign, update, route, delegate, govern, or command within an epoch. \\
+Trust epoch & A bounded policy and state universe defining legitimate identities, software, agents, governance, routing, and attestation roots. \\
+Trust succession & The planned migration of authority from a compromised epoch to a successor epoch. \\
+Clean Genesis Manifest & Public birth certificate of a successor epoch. \\
+Succession Stamp Protocol & A narrow checkpoint/finality layer that orders, scopes, contests, finalizes, anchors, and reconciles succession claims. \\
+Succession Stamp & A signed commitment to a manifest hash, evidence root, checkpoint, quorum root, validator set, scope, and status. \\
+zk-attested admission ticket & A privacy-preserving proof that a node satisfies the successor epoch's admission policy. \\
+AI Capability Passport & Scoped, expiring authority granted to an AI agent through a responsible principal. \\
+Quarantine bridge & A controlled import path from old-epoch data into the successor epoch that strips authority. \\
+Nullifier & A context-specific value that prevents double-use of a credential without revealing the credential itself. \\
+TEE & Trusted execution environment; a hardware-backed protected execution context such as SGX, TDX, SEV-SNP, or related designs. \\
+RATS & Remote ATtestation procedureS; an IETF architecture for attestation roles and evidence flows. \\
+Split brain & The existence of multiple competing successor epochs claiming legitimacy. \\
+Weak-subjectivity checkpoint & A recent trusted checkpoint or stamp obtained through independent channels, used to avoid being tricked by fabricated histories after long isolation. \\
+\bottomrule
+\end{longtable}
+
+\section{Appendix B: Minimal Data Model}
+
+\begin{lstlisting}[title={\textbf{Minimal JSON-like data model}}]
+EpochObject = {
+  "epoch_id": string,
+  "parent_epoch_id": string | null,
+  "policy_hash": digest,
+  "identity_root": merkle_root,
+  "software_root": merkle_root,
+  "attestation_root": merkle_root,
+  "ai_capability_root": merkle_root,
+  "namespace_root": merkle_root,
+  "routing_policy_root": merkle_root,
+  "revocation_root": merkle_root,
+  "quarantine_policy_hash": digest,
+  "governance_rule_hash": digest,
+  "transparency_log_roots": [merkle_root],
+  "valid_from": timestamp,
+  "valid_until": timestamp,
+  "signatures": [signature]
+}
+
+SuccessionStamp = {
+  "stamp_id": string,
+  "parent_epoch_id": string,
+  "parent_stamp_id": string | null,
+  "event_type": string,
+  "scope": string,
+  "checkpoint_root": merkle_root,
+  "clean_genesis_manifest_hash": digest,
+  "evidence_bundle_root": merkle_root,
+  "governance_quorum_root": merkle_root,
+  "validator_set_root": merkle_root,
+  "revoked_authority_root": merkle_root,
+  "expired_ai_delegation_root": merkle_root,
+  "quarantine_policy_hash": digest,
+  "status": string,
+  "timestamp_interval": [timestamp, timestamp],
+  "external_anchor_roots": [digest],
+  "proof_bundle_hash": digest,
+  "signatures": [signature]
+}
+
+AdmissionTicket = {
+  "epoch_id": string,
+  "policy_hash": digest,
+  "capability_class": string,
+  "risk_class": string,
+  "nullifier": digest,
+  "proof_system": string,
+  "proof": bytes
+}
+
+AICapabilityPassport = {
+  "passport_id": string,
+  "agent_id": string,
+  "responsible_principal_commitment": digest,
+  "model_or_deployment_class": string,
+  "allowed_tools": [string],
+  "allowed_data_scopes": [string],
+  "allowed_write_scopes": [string],
+  "spend_limit": number,
+  "compute_limit": number,
+  "delegation_depth_limit": integer,
+  "expiry": timestamp,
+  "survives_epoch_transition": false,
+  "policy_hash": digest,
+  "issuer_signatures": [signature]
+}
+\end{lstlisting}
+
+\section{Appendix C: Initial Work Packages}
+
+\begin{longtable}{p{0.20\textwidth}p{0.46\textwidth}p{0.24\textwidth}}
+\toprule
+\textbf{Work package} & \textbf{Output} & \textbf{Lead profile} \\
+\midrule
+WP1: Threat model & Rogue-AI, false-fork, supply-chain, TEE, governance-capture, and physical-partition scenarios. & Security researchers, red teams \\
+\addlinespace
+WP2: Manifest spec & Canonical encoding, signatures, policy hashes, transparency-log commitments. & Protocol engineers \\
+\addlinespace
+WP3: Policy DSL & Human-readable and machine-verifiable policy language for admission, quarantine, AI, and governance. & PL/formal methods teams \\
+\addlinespace
+WP4: ZK admission & No-trusted-setup proof for identity continuity, non-revocation, attestation result, and nullifier. & Cryptographers \\
+\addlinespace
+WP5: Attestation bridge & Multi-vendor RATS-compatible verifier abstraction and privacy-preserving result format. & Confidential computing engineers \\
+\addlinespace
+WP6: AI gateway & Capability passport issuance, tool-gateway enforcement, logs, and compliance proofs. & AI safety/security engineers \\
+\addlinespace
+WP7: Quarantine bridge & Old-object import, sanitizer policies, proof-carrying outputs, and audit logs. & Malware analysts, platform engineers \\
+\addlinespace
+WP8: Succession stamps & Provisional, justified, finalized, contested, anchored, and reconciled stamp states; equivocation evidence; scoped fork-choice rules. & Distributed systems engineers \\
+\addlinespace
+WP9: Governance drills & Fork ceremonies, tabletop exercises, legal continuity tests, false-fork UX. & Public-sector, civil society, HCI teams \\
+\bottomrule
+\end{longtable}
+
+\section{Appendix D: Bibliography}
+
+\begin{thebibliography}{99}
+
+\bibitem{ethereum_forks}
+Ethereum.org. ``Timeline of all Ethereum forks.'' \url{https://ethereum.org/ethereum-forks/}. Accessed April 2026.
+
+\bibitem{ethereum_gasper}
+Ethereum.org. ``Gasper.'' \url{https://ethereum.org/developers/docs/consensus-mechanisms/pos/gasper/}. Accessed April 2026.
+
+\bibitem{ethereum_slashing}
+Ethereum.org. ``Rewards and penalties.'' \url{https://ethereum.org/developers/docs/consensus-mechanisms/pos/rewards-and-penalties/}. Accessed April 2026.
+
+\bibitem{ethereum_weak_subjectivity}
+Ethereum.org. ``Weak subjectivity.'' \url{https://ethereum.org/developers/docs/consensus-mechanisms/pos/weak-subjectivity/}. Accessed April 2026.
+
+\bibitem{ipfs_cid}
+IPFS Docs. ``Content addressing and CIDs.'' \url{https://docs.ipfs.tech/concepts/content-addressing/}. Accessed April 2026.
+
+\bibitem{ct}
+Certificate Transparency. ``How CT Works.'' \url{https://certificate.transparency.dev/howctworks/}. Accessed April 2026.
+
+\bibitem{did}
+World Wide Web Consortium. ``Decentralized Identifiers (DIDs) v1.0.'' \url{https://www.w3.org/TR/did-core/}. Accessed April 2026.
+
+\bibitem{tuf}
+The Update Framework. ``A framework for securing software update systems.'' \url{https://theupdateframework.io/}. Accessed April 2026.
+
+\bibitem{tuf_spec}
+The Update Framework. ``TUF Specification.'' \url{https://theupdateframework.github.io/specification/latest/}. Accessed April 2026.
+
+\bibitem{intoto}
+in-toto. ``A framework to secure the integrity of software supply chains.'' \url{https://in-toto.io/}. Accessed April 2026.
+
+\bibitem{rfc9334}
+Internet Engineering Task Force. ``RFC 9334: Remote ATtestation procedureS (RATS) Architecture.'' \url{https://www.rfc-editor.org/rfc/rfc9334.html}. 2023.
+
+\bibitem{rats_daa}
+Internet Engineering Task Force. ``Direct Anonymous Attestation for the Remote Attestation Procedures Architecture.'' \url{https://datatracker.ietf.org/doc/draft-ietf-rats-daa/}. Accessed April 2026.
+
+\bibitem{intel_sgx}
+Intel. ``Attestation Services for Intel Software Guard Extensions.'' \url{https://www.intel.com/content/www/us/en/developer/tools/software-guard-extensions/attestation-services.html}. Accessed April 2026.
+
+\bibitem{aws_sevsnp}
+Amazon Web Services. ``Attest an Amazon EC2 instance with AMD SEV-SNP.'' \url{https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/snp-attestation.html}. Accessed April 2026.
+
+\bibitem{scion}
+SCION Documentation. ``SCION Overview.'' \url{https://docs.scion.org/en/latest/overview.html}. Accessed April 2026.
+
+\bibitem{zcash_nu5}
+Zcash. ``NU5 Upgrade.'' \url{https://z.cash/upgrade/nu5/}. Accessed April 2026.
+
+\bibitem{zcash_zip224}
+Zcash Improvement Proposals. ``ZIP 224: Orchard shielded protocol.'' \url{https://zips.z.cash/zip-0224}. Accessed April 2026.
+
+\bibitem{semaphore}
+Semaphore Documentation. ``What is Semaphore?'' \url{https://docs.semaphore.pse.dev/}. Accessed April 2026.
+
+\bibitem{nist_zta}
+National Institute of Standards and Technology. ``SP 800-207: Zero Trust Architecture.'' \url{https://csrc.nist.gov/pubs/sp/800/207/final}. 2020.
+
+\bibitem{pbft}
+Miguel Castro and Barbara Liskov. ``Practical Byzantine Fault Tolerance.'' Proceedings of the Third Symposium on Operating Systems Design and Implementation (OSDI), 1999. \url{https://pmg.csail.mit.edu/papers/osdi99.pdf}.
+
+\end{thebibliography}
+
+\end{document}
