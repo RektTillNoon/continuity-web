@@ -21,6 +21,8 @@
         --cyan: #6daeb9;
         --line: rgba(21, 23, 24, 0.16);
         --shadow: 0 24px 80px rgba(23, 38, 60, 0.18);
+        --page-gutter: clamp(32px, 6vw, 96px);
+        --copy-measure: 1180px;
         color-scheme: light;
         font-family:
           Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -71,12 +73,20 @@
       }
 
       .shell {
-        width: min(1180px, calc(100% - 40px));
+        width: min(1180px, calc(100% - var(--page-gutter) - var(--page-gutter)));
         margin: 0 auto;
       }
 
       .shell-wide {
-        width: min(1780px, calc(100% - 56px));
+        width: min(1780px, calc(100% - var(--page-gutter) - var(--page-gutter)));
+      }
+
+      .hero-intro,
+      .quote-band,
+      .exhibit-caption,
+      .modes {
+        max-width: var(--copy-measure);
+        margin-inline: auto;
       }
 
       .site-header {
@@ -147,12 +157,26 @@
         color: var(--ink);
       }
 
+      .button.report {
+        min-height: 54px;
+        border-color: rgba(214, 171, 90, 0.78);
+        padding: 0 24px;
+        background: var(--paper);
+        color: var(--ink);
+        box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+      }
+
+      .button.report:hover {
+        background: #fff8ea;
+        border-color: var(--amber-2);
+      }
+
       .hero {
         padding: 72px 0 86px;
       }
 
       .hero-intro {
-        max-width: 860px;
+        width: 100%;
       }
 
       .eyebrow {
@@ -270,10 +294,10 @@
 
       .section-header {
         display: grid;
-        grid-template-columns: minmax(0, 0.7fr) minmax(320px, 0.55fr);
+        grid-template-columns: minmax(0, 0.45fr) minmax(320px, 0.55fr);
         align-items: end;
         gap: clamp(32px, 5vw, 72px);
-        margin-bottom: clamp(36px, 4vw, 56px);
+        margin-bottom: 24px;
       }
 
       .section-kicker {
@@ -296,8 +320,8 @@
       .section-lede {
         max-width: 620px;
         color: var(--muted);
-        font-size: 18px;
-        line-height: 1.55;
+        font-size: 16px;
+        line-height: 1.5;
         text-wrap: pretty;
       }
 
@@ -307,48 +331,11 @@
 
       .explain-stack {
         display: grid;
-        gap: 28px;
+        gap: 18px;
       }
 
-      .split {
-        display: grid;
-        grid-template-columns: minmax(0, 0.88fr) minmax(360px, 0.52fr);
-        gap: 34px;
-        align-items: stretch;
-      }
-
-      .split > *,
       .manifest-grid > * {
         min-width: 0;
-      }
-
-      .notes {
-        display: grid;
-        gap: 1px;
-        border: 1px solid rgba(21, 23, 24, 0.13);
-        background: rgba(21, 23, 24, 0.12);
-      }
-
-      .note-grid {
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      }
-
-      .note {
-        padding: 24px;
-        background: rgba(248, 243, 232, 0.82);
-      }
-
-      .note h3 {
-        margin-bottom: 10px;
-        color: var(--navy);
-        font-size: 18px;
-        line-height: 1.2;
-      }
-
-      .note p {
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.5;
       }
 
       .quote-band {
@@ -377,45 +364,11 @@
 
       .manifest-grid {
         display: grid;
-        grid-template-columns: minmax(320px, 0.42fr) minmax(0, 1.18fr);
-        gap: 56px;
-        align-items: center;
+        gap: 18px;
       }
 
       .manifest-copy h2 {
         max-width: 640px;
-        font-size: clamp(42px, 4vw, 78px);
-      }
-
-      .manifest-list {
-        display: grid;
-        gap: 16px;
-      }
-
-      .manifest-list div {
-        display: grid;
-        grid-template-columns: 42px 1fr;
-        gap: 14px;
-        align-items: start;
-        border-top: 1px solid rgba(21, 23, 24, 0.16);
-        padding-top: 16px;
-      }
-
-      .manifest-list b {
-        color: var(--amber);
-        font-size: 14px;
-      }
-
-      .manifest-list strong {
-        display: block;
-        margin-bottom: 6px;
-        color: var(--navy);
-      }
-
-      .manifest-list p {
-        color: var(--muted);
-        font-size: 15px;
-        line-height: 1.48;
       }
 
       .dark {
@@ -423,23 +376,12 @@
         color: var(--paper);
       }
 
-      .dark h2,
-      .dark .note h3 {
+      .dark h2 {
         color: var(--paper);
       }
 
-      .dark .section-lede,
-      .dark .note p {
+      .dark .section-lede {
         color: rgba(244, 239, 227, 0.72);
-      }
-
-      .dark .note {
-        background: rgba(244, 239, 227, 0.08);
-      }
-
-      .dark .notes {
-        border-color: rgba(244, 239, 227, 0.16);
-        background: rgba(244, 239, 227, 0.14);
       }
 
       .dark .visual-frame {
@@ -452,7 +394,7 @@
       .governance-showcase,
       .federation-showcase {
         display: grid;
-        gap: 24px;
+        gap: 18px;
       }
 
       .detail-showcase .section-visual,
@@ -461,9 +403,14 @@
         width: 100%;
       }
 
-      .detail-showcase .notes,
-      .governance-showcase .notes {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+      .exhibit-caption {
+        color: var(--muted);
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
+      .dark .exhibit-caption {
+        color: rgba(244, 239, 227, 0.72);
       }
 
       .modes {
@@ -495,75 +442,115 @@
       }
 
       .closer {
-        padding: 92px 0 54px;
-        background: #111719;
+        padding: 110px 0 64px;
+        background:
+          radial-gradient(circle at 88% 12%, rgba(109, 174, 185, 0.18), transparent 30rem),
+          radial-gradient(circle at 14% 20%, rgba(214, 171, 90, 0.14), transparent 26rem),
+          #0f1718;
         color: var(--paper);
+      }
+
+      .closer-panel {
+        border: 1px solid rgba(244, 239, 227, 0.16);
+        background:
+          linear-gradient(135deg, rgba(244, 239, 227, 0.07), rgba(244, 239, 227, 0.02)),
+          rgba(10, 15, 16, 0.62);
+        padding: clamp(32px, 5vw, 72px);
+        box-shadow: 0 30px 90px rgba(0, 0, 0, 0.28);
       }
 
       .closer-grid {
         display: grid;
-        grid-template-columns: minmax(0, 0.82fr) minmax(320px, 0.45fr);
-        gap: 64px;
-        align-items: end;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 0.32fr);
+        gap: clamp(32px, 5vw, 70px);
+        align-items: start;
       }
 
       .closer h2 {
+        max-width: 980px;
         color: var(--paper);
+        font-size: clamp(34px, 4vw, 58px);
+        line-height: 1.02;
       }
 
       .closer p {
         margin-top: 24px;
-        max-width: 720px;
+        max-width: 780px;
         color: rgba(244, 239, 227, 0.7);
         font-size: 19px;
         line-height: 1.55;
       }
 
+      .closer-aside {
+        display: grid;
+        gap: 18px;
+        align-content: start;
+        border-left: 1px solid rgba(244, 239, 227, 0.16);
+        padding-left: clamp(20px, 3vw, 34px);
+      }
+
+      .closer-aside p {
+        margin: 0;
+        color: rgba(244, 239, 227, 0.78);
+        font-size: 15px;
+        line-height: 1.55;
+      }
+
       .closer-block {
-        margin-top: 42px;
+        margin-top: clamp(36px, 5vw, 70px);
+        max-width: 980px;
       }
 
       .closer-block h3 {
         color: var(--paper);
-        font-size: 22px;
-        line-height: 1.2;
+        font-size: clamp(24px, 3vw, 42px);
+        line-height: 1.06;
+      }
+
+      .closer-visual {
+        margin-top: clamp(32px, 5vw, 64px);
+        aspect-ratio: 1672 / 941;
+        box-shadow: 0 28px 80px rgba(0, 0, 0, 0.34);
       }
 
       .priority-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-auto-flow: dense;
         gap: 1px;
-        margin-top: 24px;
-        border: 1px solid rgba(244, 239, 227, 0.16);
-        background: rgba(244, 239, 227, 0.16);
+        margin-top: clamp(34px, 5vw, 64px);
+        border: 1px solid rgba(214, 171, 90, 0.22);
+        background: rgba(214, 171, 90, 0.18);
       }
 
       .priority {
-        min-height: 210px;
-        padding: 22px;
-        background: rgba(244, 239, 227, 0.07);
+        min-height: 250px;
+        padding: clamp(22px, 3vw, 34px);
+        background: rgba(11, 18, 19, 0.86);
+        box-shadow: inset 0 1px 0 rgba(244, 239, 227, 0.08);
+        transition:
+          background 180ms ease,
+          transform 180ms ease;
       }
 
-      .priority b {
-        display: block;
-        margin-bottom: 12px;
-        color: var(--amber-2);
-        font-size: 13px;
+      .priority:hover {
+        background: rgba(19, 30, 32, 0.94);
+        transform: translateY(-2px);
       }
 
       .priority strong {
         display: block;
-        margin-bottom: 10px;
+        margin-bottom: 18px;
         color: var(--paper);
-        font-size: 17px;
-        line-height: 1.2;
+        font-size: clamp(20px, 2.2vw, 30px);
+        line-height: 1.04;
       }
 
       .priority span {
         display: block;
         color: rgba(244, 239, 227, 0.7);
-        font-size: 14px;
-        line-height: 1.45;
+        font-size: 15px;
+        line-height: 1.5;
       }
 
       .coda {
@@ -583,15 +570,10 @@
       @media (max-width: 980px) {
         .hero-grid,
         .section-header,
-        .split,
         .manifest-grid,
         .quote-band,
         .closer-grid {
           grid-template-columns: 1fr;
-        }
-
-        .shell-wide {
-          width: min(1180px, calc(100% - 40px));
         }
 
         .hero-grid {
@@ -602,13 +584,6 @@
           display: none;
         }
 
-        .note-grid {
-          grid-template-columns: 1fr;
-        }
-
-        .detail-showcase .notes,
-        .governance-showcase .notes,
-        .federation-showcase .notes,
         .priority-grid {
           grid-template-columns: 1fr;
         }
@@ -619,8 +594,12 @@
       }
 
       @media (max-width: 640px) {
+        :root {
+          --page-gutter: 22px;
+        }
+
         .shell {
-          width: min(100% - 28px, 1180px);
+          width: min(100% - var(--page-gutter) - var(--page-gutter), 1180px);
         }
 
         .hero {
@@ -656,7 +635,7 @@
   </head>
   <body>
     <header class="site-header">
-      <div class="shell nav" aria-label="Primary navigation">
+      <div class="shell shell-wide nav" aria-label="Primary navigation">
         <a class="brand" href="#top" aria-label="Continuity Web home">
           <img class="brand-mark" src="assets/continuity-web-shield-logo.png" alt="Continuity Web logo">
           <span>Continuity Web</span>
@@ -676,11 +655,9 @@
         <div class="shell shell-wide">
           <div class="hero-intro">
             <div class="eyebrow">Trust succession for catastrophic compromise</div>
-            <h1>Fork authority. Prune compromise.</h1>
+            <h1>Continuity Web</h1>
             <p class="hero-copy">
-              Continuity Web preserves legitimate digital authority when identity,
-              updates, routing, clouds, and AI delegations can no longer be trusted
-              as a shared command environment.
+              A compact web presentation for the trust-succession brief.
             </p>
             <div class="hero-actions" aria-label="Primary actions">
               <a class="button" href="continuity_web_concept_brief.pdf">Read the brief</a>
@@ -717,15 +694,11 @@
           <div class="section-header">
             <div>
               <div class="section-kicker">01 - the gap</div>
-              <h2>When valid commands stop proving legitimacy</h2>
+              <h2>Failure mode</h2>
             </div>
             <p class="section-lede">
-              Catastrophic compromise is not just downtime. The harder failure is
-              authority ambiguity: commands, credentials, agents, and update roots
-              still look valid after the trust environment is contaminated. The
-              question is not whether a compromise is detected. It is whether
-              legitimate actors have a way to leave the poisoned command layer
-              behind and reconstitute authority without starting from zero.
+              Catastrophic compromise leaves ordinary commands looking valid after
+              the authority environment is no longer trustworthy.
             </p>
           </div>
           <div class="explain-stack">
@@ -735,24 +708,10 @@
                 alt="Authority roots including identity, updates, routing, cloud, agents, and governance surrounding a compromised epoch."
               >
             </figure>
-            <div class="notes note-grid" aria-label="Failure mode details">
-              <article class="note">
-                <h3>Reachability is not legitimacy</h3>
-                <p>Packets may route, domains may resolve, and services may answer while the right to command is no longer knowable.</p>
-              </article>
-              <article class="note">
-                <h3>Machine-speed delegation changes the clock</h3>
-                <p>AI systems can act through normal channels faster than human operators can interpret, revoke, or coordinate.</p>
-              </article>
-              <article class="note">
-                <h3>The missing primitive is succession</h3>
-                <p>Backups restore state. Continuity Web asks which authority is admissible after a contaminated epoch.</p>
-              </article>
-              <article class="note">
-                <h3>The speed of capture exceeds the speed of governance</h3>
-                <p>AI systems can act through delegation chains faster than human operators can interpret, revoke, or coordinate a response. The protocol addresses this mismatch structurally, not through faster humans.</p>
-              </article>
-            </div>
+            <p class="exhibit-caption">
+              The old substrate can still move data while its authority roots are
+              no longer admissible.
+            </p>
           </div>
         </div>
       </section>
@@ -769,39 +728,29 @@
       </section>
 
       <section class="section" id="manifest">
-        <div class="shell shell-wide manifest-grid">
-          <div class="manifest-copy">
+        <div class="shell shell-wide">
+          <div class="section-header">
+            <div class="manifest-copy">
             <div class="section-kicker">02 - succession</div>
-            <h2>A successor epoch starts from a signed manifest</h2>
-            <div class="manifest-list">
-              <div>
-                <b>01</b>
-                <p><strong>Declare the last attestable checkpoint</strong> The fork begins from evidence that independent parties can inspect.</p>
-              </div>
-              <div>
-                <b>02</b>
-                <p><strong>Replace contaminated roots</strong> New identity, provenance, namespace, attestation, and governance roots are explicit.</p>
-              </div>
-              <div>
-                <b>03</b>
-                <p><strong>Admit by proof, not reputation</strong> Participants prove policy compliance with fresh keys and privacy-preserving nullifiers.</p>
-              </div>
-              <div>
-                <b>04</b>
-                <p><strong>Commit non-negotiable floors</strong> Core policy terms are cryptographically committed in the manifest and not subject to negotiation. Conceding a floor is not a quiet capitulation; it is a detectable change of fundamental terms with a forensic trail. AI agents can negotiate preference terms freely. They cannot concede a core term.</p>
-              </div>
-              <div>
-                <b>05</b>
-                <p><strong>Core terms vs. preference terms.</strong> Core terms are committed in the manifest, a guarantee, not a promise. Preference terms can flex within declared bounds. This means a government or upstream epoch cannot silently extract concessions from a downstream one.</p>
-              </div>
+            <h2>Succession manifest</h2>
             </div>
+            <p class="section-lede">
+              A successor epoch starts by declaring the evidence boundary and the
+              fresh roots that replace contaminated command paths.
+            </p>
           </div>
-          <figure class="visual-frame section-visual">
-            <img
-              src="assets/continuity-web-manifest.png"
-              alt="Clean Genesis Manifest document and zk-attested admission gateway into a successor epoch."
-            >
-          </figure>
+          <div class="manifest-grid">
+            <figure class="visual-frame section-visual">
+              <img
+                src="assets/continuity-web-manifest.png"
+                alt="Clean Genesis Manifest document and zk-attested admission gateway into a successor epoch."
+              >
+            </figure>
+            <p class="exhibit-caption">
+              The manifest is the hard boundary between a contaminated epoch and
+              the successor ruleset.
+            </p>
+          </div>
         </div>
       </section>
 
@@ -810,12 +759,11 @@
           <div class="section-header">
             <div>
               <div class="section-kicker">03 - boundary</div>
-              <h2>Import evidence. Do not import command.</h2>
+              <h2>Quarantine bridge</h2>
             </div>
             <p class="section-lede">
-              Quarantine bridges let old-epoch data cross as content-addressed,
-              sandboxed, read-only evidence. Credentials, executable permissions,
-              updates, and governance claims do not cross by default.
+              The bridge is deliberately narrow: useful old-epoch records can cross
+              as evidence, but command rights do not inherit legitimacy.
             </p>
           </div>
           <div class="detail-showcase">
@@ -825,20 +773,10 @@
                 alt="Quarantine bridge filtering old epoch data into a successor epoch while blocking authority and expiring AI capability passports."
               >
             </figure>
-            <div class="notes note-grid" aria-label="Quarantine and AI delegation details">
-              <article class="note">
-                <h3>Old data can be valuable</h3>
-                <p>Logs, records, and snapshots cross the quarantine bridge as content-addressed, sandboxed, read-only evidence after sanitization and successor re-signing. They retain historical value without retaining command power.</p>
-              </article>
-              <article class="note">
-                <h3>Old authority is structurally untrusted</h3>
-                <p>Admin rights, update channels, agent keys, and command paths do not inherit legitimacy from the old epoch. Every claim must earn fresh admissibility under successor policy, proving compliance instead of asserting reputation.</p>
-              </article>
-              <article class="note">
-                <h3>AI capability passports: scope, duration, binding</h3>
-                <p>A passport specifies what the agent can do, for how long, and to which epoch it is bound. It is meaningless outside the issuing epoch and destroyed by succession. There is no implicit perpetuity. No silent transfer.</p>
-              </article>
-            </div>
+            <p class="exhibit-caption">
+              The key distinction is admissibility: evidence may be imported,
+              authority must be re-earned under the successor epoch.
+            </p>
           </div>
         </div>
       </section>
@@ -848,16 +786,11 @@
           <div class="section-header">
             <div>
               <div class="section-kicker">04 - legitimacy</div>
-              <h2>No single actor gets to declare the new web</h2>
+              <h2>Governance stamp</h2>
             </div>
             <p class="section-lede">
-              A clean fork requires quorum-of-quorums governance: independent
-              technical validators, public institutions, operators, auditors,
-              hardware-root diversity, open-source maintainers, and recovery
-              guardians, drawn from multiple jurisdictions with competing
-              incentives. Compromising enough of them simultaneously is a
-              fundamentally harder problem than capturing a single root certificate
-              authority.
+              Legitimacy comes from scoped claims by independent quorums, not from a
+              single privileged actor announcing that the new epoch is real.
             </p>
           </div>
           <div class="governance-showcase">
@@ -867,20 +800,10 @@
                 alt="Independent quorums converging on a succession stamp beside degraded response modes."
               >
             </figure>
-            <div class="notes" aria-label="Governance details">
-              <article class="note">
-                <h3>Stamps are scoped claims</h3>
-                <p>They commit to manifest hash, evidence root, checkpoint, quorum root, validator set, and status.</p>
-              </article>
-              <article class="note">
-                <h3>Regions can operate locally</h3>
-                <p>Provisional, justified, finalized, contested, and reconciled states reduce announcement wars.</p>
-              </article>
-              <article class="note">
-                <h3>Authoritarianism becomes legible, not impossible</h3>
-                <p>The protocol cannot prevent a sufficiently powerful actor from imposing terms. It can make the imposition a permanent, publicly verifiable artifact visible to every epoch that relies on the governance layer. Coercion that was previously invisible becomes auditable and contestable.</p>
-              </article>
-            </div>
+            <p class="exhibit-caption">
+              A succession claim is inspectable because every stamp is scoped to a
+              manifest, evidence root, validator set, and status.
+            </p>
 
             <div class="modes" aria-label="Continuity modes">
               <div class="mode"><b>01</b><span>Increase logging</span></div>
@@ -899,14 +822,11 @@
           <div class="section-header">
             <div>
               <div class="section-kicker">05 - the web</div>
-              <h2>Recognition is voluntary. Hierarchy is emergent.</h2>
+              <h2>Federation graph</h2>
             </div>
             <p class="section-lede">
-              Continuity Web is not a tree with a privileged root. It is a graph
-              where any epoch can recognize any other. The chain from home network
-              to ISP to city to state to federal forms because recognition from the
-              layer above is valuable, not because the protocol mandates deference.
-              Every recognition relationship is declared, policy-bound, and auditable.
+              This is the composition layer: epochs recognize one another by policy,
+              and hierarchy emerges from useful recognition rather than protocol fiat.
             </p>
           </div>
           <div class="federation-showcase">
@@ -916,20 +836,10 @@
                 alt="Federated trust epochs forming voluntary recognition paths with policy deltas, zero-knowledge admission proof, and alternative routing around coercive mandates."
               >
             </figure>
-            <div class="notes note-grid" aria-label="Federated epoch details">
-              <article class="note">
-                <h3>The home epoch is the atomic unit</h3>
-                <p>A household router can constitute an epoch, declaring admitted devices, authorized AI agents, and acceptable data practices. Your home epoch publishes its terms. The ISP decides whether to recognize them on those terms.</p>
-              </article>
-              <article class="note">
-                <h3>The missing middle reconstitutes itself</h3>
-                <p>A city, county, homeowners association, regional water cooperative, mesh network, professional licensing body, or mutual aid network can insert at any layer without permission from above. The epoch model lets the middle grow back.</p>
-              </article>
-              <article class="note">
-                <h3>Coercion leaves forensic traces</h3>
-                <p>If a federal authority mandates surveillance terms on an ISP epoch, the policy delta is visible in the ISP's manifest the instant it occurs. Home epochs detect the change and can re-route through alternative recognition paths.</p>
-              </article>
-            </div>
+            <p class="exhibit-caption">
+              The graph is the point: recognition stays voluntary, policy deltas
+              stay visible, and alternate paths remain possible.
+            </p>
             <div class="quote-band">
               <p>Privacy is the security property, not its opposite.</p>
               <span>
@@ -945,64 +855,62 @@
 
       <section class="closer">
         <div class="shell">
-          <div class="closer-grid">
-            <div>
-              <div class="section-kicker">Consortium target</div>
-              <h2>Build the minimum credible succession demo.</h2>
+          <div class="closer-panel">
+            <div class="closer-grid">
+              <div>
+                <div class="section-kicker">Consortium target</div>
+                <h2>Build the package registry that can survive its own compromise.</h2>
+                <p>
+                  Prove trust succession in a bounded software ecosystem before
+                  asking the wider internet to believe it.
+                </p>
+              </div>
+              <aside class="closer-aside" aria-label="Consortium target summary">
+                <p>
+                  Target: a forkable package registry for a university/security-lab
+                  consortium.
+                </p>
+                <a class="button report" href="continuity_web_report.pdf">Open the technical report</a>
+              </aside>
+            </div>
+
+            <div class="closer-block">
+              <h3>MVP demonstration</h3>
               <p>
-                The first program should not replace the internet. It should prove
-                succession for a bounded community: a software ecosystem, university
-                network, emergency-response consortium, or critical-infrastructure
-                simulation.
+                Compromise the update channel, fork authority into a successor
+                registry, admit developers with tickets, and quarantine old packages.
               </p>
             </div>
-            <a class="button" href="continuity_web_report.pdf">Open the technical report</a>
-          </div>
-          <div class="closer-block">
-            <h3>What success actually looks like:</h3>
-            <p>
-              Success is not adoption. Adoption is downstream. Success is whether,
-              in a worked scenario where a federal authority issues a surveillance
-              mandate to an ISP, the ISP epoch's policy delta is detectable by the
-              home epochs that recognize it, those home epochs can re-route through
-              alternative recognition paths, and the mandate becomes part of the
-              public forensic record without being visible to the federal authority
-              itself. Coercion attempted. Coercion detected. Coercion routed around.
-              Coercion entered into the permanent record.
-            </p>
-          </div>
-          <div class="priority-grid" aria-label="Build priorities">
-            <div class="priority">
-              <b>01</b>
-              <strong>Governance specification</strong>
-              <span>Quorum composition, validator selection, removal procedures, and capture resistance over time. The cryptography is solid. The governance layer is where real fragility lives.</span>
-            </div>
-            <div class="priority">
-              <b>02</b>
-              <strong>Worked adversarial scenarios</strong>
-              <span>Federal coercion of an ISP epoch, manifest delta detection, and cross-epoch revocation. Working through these reveals where resistance is real versus assumed.</span>
-            </div>
-            <div class="priority">
-              <b>03</b>
-              <strong>Consumer prototype</strong>
-              <span>The home epoch with AI capability passports: declared terms for your network, scoped authorization for AI agents, and no perpetual access.</span>
-            </div>
-            <div class="priority">
-              <b>04</b>
-              <strong>Bounded community pilots</strong>
-              <span>A university network, an ISP, or a mesh cooperative: small enough that governance is real, large enough to prove federation between two pilot epochs.</span>
+
+            <figure class="closer-visual visual-frame">
+              <img
+                src="assets/continuity-web-mvp-demo.png"
+                alt="MVP demonstration diagram showing a compromised package registry, Clean Genesis Manifest and Succession Stamp checkpoint, quarantine bridge, admitted developers, and a successor registry."
+              >
+            </figure>
+
+            <div class="priority-grid" aria-label="Build priorities">
+              <div class="priority">
+                <strong>Governance specification</strong>
+                <span>Who can declare succession, how claims are challenged, and how capture is resisted.</span>
+              </div>
+              <div class="priority">
+                <strong>Forkable package registry</strong>
+                <span>A realistic supply-chain target for provenance, revocation, false forks, and client recognition.</span>
+              </div>
+              <div class="priority">
+                <strong>AI-agent containment</strong>
+                <span>Scoped coding agents that expire at succession unless re-authorized.</span>
+              </div>
+              <div class="priority">
+                <strong>Security-lab consortium</strong>
+                <span>Universities, white hats, maintainers, and cryptographers running adversarial drills.</span>
+              </div>
             </div>
           </div>
           <p class="coda">
-            Continuity Web was designed to solve an AI safety problem. But the
-            properties it produces, voluntary recognition, declared policies,
-            private verification, forensic permanence, and no architecturally
-            privileged root, are also the properties that the counter-economic
-            tradition has wanted and never had for fifty years. Every generation
-            got the vision right and hit the same wall: trust does not scale
-            between strangers without institutions, and every institution is
-            eventually captured. The agora was always the destination. This is
-            finally the infrastructure.
+            The demo is narrow on purpose: if authority cannot be recovered here,
+            it will not be recovered at internet scale.
           </p>
           <footer class="footer">
             Continuity Web is a proposed open research program for recoverable
