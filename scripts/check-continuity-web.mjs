@@ -26,6 +26,7 @@ const requiredAssets = [
   "assets/continuity-web-quarantine.png",
   "assets/continuity-web-governance.png",
   "assets/continuity-web-federation.png",
+  "assets/continuity-web-mvp-demo.png",
 ];
 const requiredDocuments = [
   "continuity_web_concept_brief.pdf",
@@ -43,22 +44,17 @@ for (const documentPath of requiredDocuments) {
 }
 
 const requiredCopy = [
-  "Fork authority. Prune compromise.",
-  "When valid commands stop proving legitimacy",
-  "The speed of capture exceeds the speed of governance",
-  "A successor epoch starts from a signed manifest",
-  "Commit non-negotiable floors",
-  "Core terms vs. preference terms.",
-  "Import evidence. Do not import command.",
-  "AI capability passports: scope, duration, binding",
-  "No single actor gets to declare the new web",
-  "Authoritarianism becomes legible, not impossible",
-  "Recognition is voluntary. Hierarchy is emergent.",
-  "Privacy is the security property",
+  "Continuity Web",
+  "Failure mode",
+  "Succession manifest",
+  "Quarantine bridge",
+  "Governance stamp",
+  "Federation graph",
   "Continuity Web does not replace incident response",
-  "What success actually looks like:",
+  "forkable package registry",
+  "MVP demonstration",
   "Governance specification",
-  "The agora was always the destination.",
+  "The demo is narrow on purpose",
 ];
 
 for (const text of requiredCopy) {
@@ -76,12 +72,16 @@ assert(
   "Explanatory graphic sections should use the non-overlapping explain-stack layout",
 );
 assert(
-  html.includes('class="notes note-grid"'),
-  "Explanatory notes should sit below graphics in a note-grid",
+  html.includes('class="exhibit-caption"'),
+  "Explanatory graphic sections should use concise captions instead of duplicated note grids",
 );
 assert(
   html.includes('src="assets/continuity-web-shield-logo.png"'),
   "Header logo should use the canonical shield logo image",
+);
+assert(
+  html.includes('<div class="shell shell-wide nav" aria-label="Primary navigation">'),
+  "Header brand should align with the wide graphics shell",
 );
 assert(
   html.includes('alt="Continuity Web logo"'),
@@ -105,20 +105,12 @@ assert(
   "Shield logo PNG should be RGBA so it can render with a transparent background",
 );
 assert(
-  html.includes('class="hero-visual-wide visual-frame"'),
-  "Hero graphic should use a wide, legible layout rather than a small side thumbnail",
-);
-assert(
   html.includes('<section class="hero">\n        <div class="shell shell-wide">'),
   "Hero should use the wide shell so it aligns with the main explanatory sections",
 );
 assert(
   html.includes('id="failure">\n        <div class="shell shell-wide">'),
   "Failure section should use the wide shell so its diagram spacing matches the later explanatory sections",
-);
-assert(
-  html.includes('class="shell shell-wide manifest-grid"'),
-  "Manifest section should use a wider shell so the detailed graphic is large enough to read",
 );
 assert(
   html.includes('id="quarantine">\n        <div class="shell shell-wide">'),
@@ -159,7 +151,7 @@ assert(
 );
 assert(
   html.indexOf('class="hero-visual-wide visual-frame"') < html.indexOf('class="hero-proof"'),
-  "Hero graphic should appear before proof cards so it is visible sooner",
+  "Hero graphic should stay in the hero and appear before proof cards",
 );
 assert(
   !html.includes('class="graphic-logo-overlay"'),
@@ -180,6 +172,114 @@ assert(
 assert(
   html.includes("max-width: 880px"),
   "Hero headline should be wide enough to avoid a weak three-line desktop wrap",
+);
+assert(
+  html.includes("--page-gutter: clamp("),
+  "Page should use a shared responsive gutter instead of per-section edge spacing",
+);
+assert(
+  html.includes("calc(100% - var(--page-gutter) - var(--page-gutter))"),
+  "Shell widths should reserve the shared gutter on both viewport edges",
+);
+assert(
+  html.includes(".shell-wide {\n        width: min(1780px, calc(100% - var(--page-gutter) - var(--page-gutter)));"),
+  "Wide sections should use the same shared gutter as standard sections",
+);
+assert(
+  html.includes("--copy-measure: 1180px"),
+  "Copy-bearing blocks should share the standard reading measure from the closer section",
+);
+assert(
+  html.includes("max-width: var(--copy-measure);"),
+  "Copy-bearing blocks should be inset within wide graphic sections",
+);
+assert(
+  html.includes(".hero-intro,\n      .quote-band,\n      .exhibit-caption,\n      .modes"),
+  "Hero, captions, and other copy groups should use the shared copy inset",
+);
+assert(
+  !html.includes(".hero-intro,\n      .section-header,\n      .quote-band"),
+  "Section headers should align with wide graphic edges, not the narrower copy inset",
+);
+assert(
+  !html.includes('class="notes'),
+  "Graphic sections should not keep duplicated note grids below text-heavy graphics",
+);
+assert(
+  !html.includes(".notes") && !html.includes(".note "),
+  "Dead note-grid CSS should be removed with the note-grid markup",
+);
+assert(
+  !html.includes('class="manifest-list"'),
+  "Manifest section should not duplicate the manifest graphic with a second HTML list",
+);
+assert(
+  !html.includes("surveillance mandate"),
+  "Consortium target should not center the surveillance-mitigation scenario",
+);
+assert(
+  html.includes("successor registry"),
+  "Consortium target should still reference the successor registry success condition",
+);
+assert(
+  html.includes(".button.report"),
+  "Dark closer CTA should use a dedicated visible report button variant",
+);
+assert(
+  html.includes('<a class="button report" href="continuity_web_report.pdf">Open the technical report</a>'),
+  "Technical report CTA should use the report button variant",
+);
+assert(
+  html.includes('class="closer-panel"'),
+  "Consortium target should use a designed editorial panel",
+);
+assert(
+  html.includes('src="assets/continuity-web-mvp-demo.png"'),
+  "Consortium target should include the MVP demonstration graphic",
+);
+assert(
+  html.includes('class="closer-visual visual-frame"'),
+  "Consortium target graphic should use the framed visual treatment",
+);
+assert(
+  html.includes("grid-auto-flow: dense"),
+  "Consortium target proof grid should be dense and gapless",
+);
+assert(
+  !html.includes('<div class="priority">\n                <b>'),
+  "Consortium target cards should not use cheap numbered labels",
+);
+assert(
+  html.includes("background: rgba(11, 18, 19, 0.86);"),
+  "Consortium target cards should use the dark section palette instead of flat gray panels",
+);
+assert(
+  !html.includes("linear-gradient(180deg, rgba(244, 239, 227, 0.105), rgba(244, 239, 227, 0.055))"),
+  "Consortium target cards should not use gray translucent fills",
+);
+assert(
+  !html.includes("Continuity Web becomes concrete when a bounded software community"),
+  "Consortium target should not keep the verbose explanatory opener",
+);
+assert(
+  /security-lab\s+consortium/.test(html),
+  "Consortium target should keep the paper-grounded security-lab consortium target",
+);
+assert(
+  !html.includes("Quorum composition, validator selection, removal procedures"),
+  "Consortium target cards should use terse workstream copy",
+);
+assert(
+  html.includes("font-size: clamp(34px, 4vw, 58px);"),
+  "Consortium target headline should use a restrained title scale",
+);
+assert(
+  !html.includes("Red team compromises the update channel."),
+  "Consortium target should let the MVP graphic carry the detailed scenario",
+);
+assert(
+  !html.includes("font-size: clamp(42px, 6vw, 92px);"),
+  "Consortium target headline should not use oversized hero scale",
 );
 
 console.log("continuity-web html checks passed");
