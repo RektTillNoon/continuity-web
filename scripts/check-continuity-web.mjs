@@ -81,6 +81,10 @@ assert(
   "Header logo should use the canonical shield logo image",
 );
 assert(
+  html.includes('<link rel="icon" type="image/png" href="assets/cw-logo-solid.png">'),
+  "Site should use the solid shield logo as its favicon",
+);
+assert(
   html.includes('<div class="shell shell-wide nav" aria-label="Primary navigation">'),
   "Header brand should align with the wide graphics shell",
 );
