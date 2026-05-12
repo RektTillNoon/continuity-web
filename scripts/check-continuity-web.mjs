@@ -32,6 +32,7 @@ const requiredDocuments = [
   "continuity_web_concept_brief.pdf",
   "continuity_web_report.pdf",
 ];
+const githubUrl = "https://github.com/RektTillNoon/continuity-web";
 
 for (const asset of requiredAssets) {
   assert(html.includes(asset), `${asset} is not referenced`);
@@ -228,6 +229,18 @@ assert(
 assert(
   html.includes('<a class="button report" href="continuity_web_report.pdf">Open the technical report</a>'),
   "Technical report CTA should use the report button variant",
+);
+assert(
+  html.includes(`href="${githubUrl}"`),
+  "Site should link to the public GitHub repository",
+);
+assert(
+  html.includes(`href="${githubUrl}" target="_blank" rel="noopener noreferrer"`),
+  "External GitHub link should open safely in a new tab",
+);
+assert(
+  html.includes('>GitHub</a>'),
+  "GitHub repository link should be presented as a concise button label",
 );
 assert(
   html.includes('class="closer-panel"'),
